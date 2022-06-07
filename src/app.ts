@@ -1,21 +1,27 @@
-import express from 'express'
-import { appRoutes } from './routes'
-import { errorMiddleware } from './middlewares/error.middleware'
-import { Request, Response } from 'express'
+import express from "express";
+import { appRoutes } from "./routes";
+import { errorMiddleware } from "./middlewares/error.middleware";
+import { Request, Response } from "express";
+import * as dotenv from "dotenv";
 
-const app = express()
+dotenv.config();
 
-app.use(express.json())
+const app = express();
 
-appRoutes(app)
+app.use(express.json());
 
-app.get('/', (req: Request, res: Response) => {
-    
-    res.status(200).json({
-        message: "Hello World"
-    })
-})
+appRoutes(app);
 
-app.use(errorMiddleware)
+app.get("/", (req: Request, res: Response) => {
+  res.status(200).json({
+    message: "Hello World",
+  });
+});
 
-app.listen(3000)
+app.use(errorMiddleware);
+
+const port = process.env.PORT ?? 3000;
+
+app.listen(port, () => {
+  console.log(`App running on http://localhost:${port}`);
+});
