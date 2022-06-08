@@ -5,8 +5,11 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 
 
-const companyLoginService = () => {
+const companyLoginService = async ({email, password}: ICompanyLogin) => {
     try {
+        const companyRepository = AppDataSource.getRepository(Company)
+
+        const account = await companyRepository.find()
         
     } catch (error) {
         
