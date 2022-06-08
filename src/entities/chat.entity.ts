@@ -18,10 +18,10 @@ export class Chat {
     archived: boolean
 
     @Column()
-    parent_id_main: number
+    parent_id_main: string
 
     @Column()
-    parent_id_retrieve: number
+    parent_id_retrieve: string
 
     @ManyToOne(type => Message, message => message.chat_id)
     messages: Message[]

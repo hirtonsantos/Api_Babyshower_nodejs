@@ -14,10 +14,10 @@ export class Message {
     read_message: boolean
 
     @Column()
-    parent_id: number
+    parent_id: string
 
     @Column()
-    chat_id: number
+    chat_id: string
 
     constructor() {
         if (!this.id) {
