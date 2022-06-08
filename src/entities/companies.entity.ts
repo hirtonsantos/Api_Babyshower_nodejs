@@ -1,3 +1,4 @@
+import { compare } from "bcrypt";
 import { Entity, Column, PrimaryColumn, OneToMany } from "typeorm";
 import { v4 as uuid } from "uuid";
 import { Advert } from "./adverts.entity";
@@ -28,10 +29,14 @@ export class Company {
   @Column({ nullable: true })
   logoImage?: string;
 
-  @OneToMany((type) => Advert, (advert) => advert.companie, {
+  @OneToMany((type) => Advert, (advert) => advert.company, {
     eager: true,
   })
   adverts: Advert[];
+
+  comparePwd = async (pwdString: string): Promise<boolean> => {
+    return await compare(pwdString, this.passwordHash);
+  };
 
   constructor() {
     if (!this.id) {
