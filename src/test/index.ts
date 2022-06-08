@@ -1,8 +1,7 @@
 import { faker } from "@faker-js/faker";
-import jwt from "jsonwebtoken";
-import { Company } from "../entities/companies.entity";
+import { Companie } from "../entities/companies.entity";
 
-const generateCompany = (): Partial<Company> => {
+const generateCompany = (): Partial<Companie> => {
   const razaoSocial = faker.company.companyName().toUpperCase();
   const username = faker.internet.userName(razaoSocial).toLowerCase();
   const email = faker.internet.email(razaoSocial).toLocaleLowerCase();

@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "ts-node-dev src/app.ts",
     "typeorm": "typeorm-ts-node-commonjs",
-    "test": "jest"
+    "test": "jest --detectOpenHandles --passWithNoTests"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.2.0",

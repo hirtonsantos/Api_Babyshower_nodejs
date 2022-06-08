@@ -3,7 +3,7 @@ import { v4 as uuid } from "uuid";
 import { Advert } from "./adverts.entity";
 
 @Entity("companies")
-export class Company {
+export class Companie {
   @PrimaryColumn("uuid")
   readonly id: string;
 
