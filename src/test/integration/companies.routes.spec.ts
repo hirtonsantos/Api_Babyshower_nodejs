@@ -1,10 +1,12 @@
-import { generateCompany } from "..";
+import { generateCompany, ICompany } from "..";
 import { Companie } from "../../entities/companies.entity";
 import supertest from "supertest";
 import app from "../../app";
 import { validate } from "uuid";
 import { DataSource } from "typeorm";
 import { AppDataSource } from "../../data-source";
+import { hashSync } from "bcrypt";
+import { verify } from "jsonwebtoken";
 
 describe("Create company route | Integration Test", () => {
   let connection: DataSource;
@@ -21,14 +23,14 @@ describe("Create company route | Integration Test", () => {
     await connection.destroy();
   });
 
-  const company: Partial<Companie> = generateCompany();
+  const company: Partial<ICompany> = generateCompany();
 
   it("Return: User as JSON reponse | Status code 201", async () => {
     const response = await supertest(app)
       .post("/companies")
       .send({ ...company });
 
-    const { passwordHash, ...newCompany } = company;
+    const { password, ...newCompany } = company;
 
     expect(response.status).toBe(201);
     expect(response.body).toHaveProperty(["id"]);
@@ -38,7 +40,7 @@ describe("Create company route | Integration Test", () => {
   });
 
   it("Return: Body error, missing password | Status code: 422", async () => {
-    const { passwordHash, ...newCompany } = company;
+    const { password, ...newCompany } = company;
 
     const response = await supertest(app)
       .post("/companies")
@@ -64,4 +66,56 @@ describe("Create company route | Integration Test", () => {
   });
 });
 
-/* describe("Login company route | Integration Test", () => {}); */
+describe("Login company route | Integration Test", () => {
+  let connection: DataSource;
+
+  let payload = generateCompany();
+  let company: Companie;
+
+  beforeAll(async () => {
+    await AppDataSource.initialize()
+      .then((res) => (connection = res))
+      .catch((err) => {
+        console.error("Error during Data Source initialization", err);
+      });
+
+    const companyRepo = connection.getRepository(Companie);
+    const { password, ...newPayload } = payload;
+
+    company = await companyRepo.save({
+      ...newPayload,
+      passwordHash: hashSync(password as string, 8),
+    });
+  });
+
+  afterAll(async () => {
+    await connection.destroy();
+  });
+
+  it("Return: token as JSON response | Status code: 200", async () => {
+    const { email, password } = payload;
+
+    const response = await supertest(app)
+      .post("/companies/login")
+      .send({ email, password });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty("access_token");
+    expect(
+      verify(response.body.access_token, process.env.SECRET_KEY as string)
+    ).toBeTruthy();
+  });
+
+  it("Return: Body error, invalid credentials | Status code: 401", async () => {
+    const { email } = payload;
+
+    const response = await supertest(app)
+      .post("/login")
+      .send({ email, password: "wrongPassword" });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toStrictEqual({
+      Error: "User not authorized",
+    });
+  });
+});
