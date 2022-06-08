@@ -21,7 +21,7 @@ export class Advert {
   linkAdverts: string;
 
   @ManyToOne((type) => Company, (company) => company.adverts)
-  companie: Company;
+  company: Company;
 
   @ManyToOne((type) => CategoryAdvert, (category) => category.adverts, {
     eager: true,
