@@ -5,7 +5,7 @@ import path from "path";
 
 dotenv.config();
 
-const AppDataSource =
+export const AppDataSource =
   process.env.NODE_ENV === "test"
     ? new DataSource({
         type: "sqlite",
