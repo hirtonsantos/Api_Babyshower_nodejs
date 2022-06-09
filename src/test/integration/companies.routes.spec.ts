@@ -1,4 +1,4 @@
-import { generateCompany, ICompany } from "..";
+import { generateCompany, generateToken, ICompany } from "..";
 import { Companie } from "../../entities/companies.entity";
 import supertest from "supertest";
 import app from "../../app";
@@ -126,4 +126,75 @@ describe("Login company route | Integration Test", () => {
 
     expect(response.status).toBe(400);
   });
+});
+
+describe("Get companies route | Integration Test", () => {
+  let connection: DataSource;
+
+  let companies: Companie[];
+
+  beforeAll(async () => {
+    await AppDataSource.initialize()
+      .then((res) => (connection = res))
+      .catch((err) => {
+        console.error("Error during Data Source initialization", err);
+      });
+
+    const companyRepo = connection.getRepository(Companie);
+
+    for (let i = 1; i < 10; i++) {
+      const { password, ...newPayload } = generateCompany();
+
+      companies.push(
+        await companyRepo.save({
+          ...newPayload,
+          passwordHash: hashSync(password as string, 8),
+        })
+      );
+    }
+  });
+
+  afterAll(async () => {
+    await connection.destroy();
+  });
+
+  //OS TESTES COMENTADOS SÓ SERÃO CONCLUÍDOS APÓS ENTITY ADMINISTRATOR ESTAR CONCLÚIDA
+
+  /* it("Return: Users as JSON response | Status code: 200", async () => {}); */
+
+  /* it("Return: Users as JSON response page 2 | Status code: 200", async () => {}); */
+
+  it("Return: Body error, missing token | Status code: 400", async () => {
+    const response = await supertest(app).get("/companies");
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({
+      Error: "Missing authorization token",
+    });
+  });
+
+  it("Return: Body error, invalid token | Status code: 401", async () => {
+    const token = "invalidToken";
+
+    const response = await supertest(app)
+      .get("/companies")
+      .set("Authorization", "Bearer " + token);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
+  });
+
+  /* it("Return: Body error, no permision | Status code: 401", async () => {
+    const token = generateToken(company.id);
+
+    const response = await supertest(app)
+      .get("/companies")
+      .set("Authorization", "Bearer " + token);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toStrictEqual({
+      Error: "You are not allowed to access this information",
+    });
+  }); */
 });
