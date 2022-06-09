@@ -20,7 +20,7 @@ export class Company {
   @Column()
   razaoSocial: string;
 
-  @Column({ unique: true, length: 11 })
+  @Column({ unique: true, length: 14 })
   cnpj: string;
 
   @Column({ nullable: true })

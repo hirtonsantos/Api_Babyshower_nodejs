@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { Company } from "../entities/companies.entity";
 
 export interface ICompany extends Partial<Company> {
-  passwordHash: string;
+  password: string;
 }
 
 const generateCompany = (): Partial<ICompany> => {
