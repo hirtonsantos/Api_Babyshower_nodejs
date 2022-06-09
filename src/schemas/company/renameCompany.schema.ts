@@ -39,7 +39,7 @@ const serializedCreateUserSchema = yup.object().shape({
   email: yup.string().email().required(),
   razaoSocial: yup.string().required(),
   cnpj: yup.string().required(),
-  phone: yup.string().optional(),
+  phone: yup.string().optional().nullable(),
 });
 
 export { registerCompanySchema, serializedCreateUserSchema };

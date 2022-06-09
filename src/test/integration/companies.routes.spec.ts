@@ -47,6 +47,8 @@ describe("Create company route | Integration Test", () => {
       .post("/companies/")
       .send({ ...newCompany });
 
+    console.log(response.body);
+
     expect(response.status).toBe(422);
     expect(response.body).toHaveProperty("errors");
     expect(response.body).toStrictEqual({
@@ -58,6 +60,8 @@ describe("Create company route | Integration Test", () => {
     const response = await supertest(app)
       .post("/companies/")
       .send({ ...company });
+
+    console.log(response.body);
 
     expect(response.status).toBe(409);
     expect(response.body).toHaveProperty("error");
