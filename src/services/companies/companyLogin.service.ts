@@ -12,10 +12,8 @@ const companyLoginService = async ({email, password}: ICompanyLogin) => {
         const companyRepository = AppDataSource.getRepository(Company)
 
         const companies = await companyRepository.find()
-        // console.log("companies=", companies)
 
         const account = companies.find(company => company.email === email)
-        // console.log("account=", account)
 
         if (!account) {
             return {
