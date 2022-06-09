@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import validateSchema from "../middlewares/validateSchema.middleware";
 import { registerCompanySchema } from "../schemas/company/renameCompany.schema";
+import loginUserSchema from "../schemas/company/loginUserSchema.schema"
 import verifyUniqueValuesMW from "../middlewares/companies/verifyUniqueValues.middleware";
 
 import companiesListController from "../controllers/companies/companiesList.controller";
@@ -20,7 +21,7 @@ export const companiesRoutes = () => {
     verifyUniqueValuesMW,
     companyRegisterController
   );
-  routes.post("/login", companyLoginController);
+  routes.post("/login", validateSchema(loginUserSchema), companyLoginController);
   routes.get("/", companiesListController);
   routes.get("/:id", companyListOneController);
   routes.patch("/:id", companyUpdateController);

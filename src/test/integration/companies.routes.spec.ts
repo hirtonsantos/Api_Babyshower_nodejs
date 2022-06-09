@@ -9,63 +9,63 @@ import { hashSync } from "bcrypt";
 import { verify } from "jsonwebtoken";
 import { endsWith } from "lodash";
 
-// describe("Create company route | Integration Test", () => {
-//   let connection: DataSource;
+describe("Create company route | Integration Test", () => {
+  let connection: DataSource;
 
-//   beforeAll(async () => {
-//     await AppDataSource.initialize()
-//       .then((res) => (connection = res))
-//       .catch((err) => {
-//         console.error("Error during Data Source initialization", err);
-//       });
-//   });
+  beforeAll(async () => {
+    await AppDataSource.initialize()
+      .then((res) => (connection = res))
+      .catch((err) => {
+        console.error("Error during Data Source initialization", err);
+      });
+  });
 
-//   afterAll(async () => {
-//     await connection.destroy();
-//   });
+  afterAll(async () => {
+    await connection.destroy();
+  });
 
-//   const company: Partial<ICompany> = generateCompany();
+  const company: Partial<ICompany> = generateCompany();
 
-//   it("Return: Company as JSON reponse | Status code 201", async () => {
-//     const { passwordHash, ...newCompany } = company;
+  it("Return: Company as JSON reponse | Status code 201", async () => {
+    const { passwordHash, ...newCompany } = company;
 
-//     const response = await supertest(app)
-//       .post("/companies")
-//       .send({ ...company });
+    const response = await supertest(app)
+      .post("/companies")
+      .send({ ...company });
 
-//     expect(response.status).toBe(201);
-//     expect(response.body).toHaveProperty(["id"]);
-//     expect(response.body).toHaveProperty(["phone"]);
-//     expect(validate(response.body.id)).toBeTruthy();
-//     expect(response.body).toEqual(expect.objectContaining({ ...newCompany }));
-//   });
+    expect(response.status).toBe(201);
+    expect(response.body).toHaveProperty(["id"]);
+    expect(response.body).toHaveProperty(["phone"]);
+    expect(validate(response.body.id)).toBeTruthy();
+    expect(response.body).toEqual(expect.objectContaining({ ...newCompany }));
+  });
 
-//   it("Return: Body error, missing password | Status code: 422", async () => {
-//     const { passwordHash, ...newCompany } = company;
+  it("Return: Body error, missing password | Status code: 422", async () => {
+    const { passwordHash, ...newCompany } = company;
 
-//     const response = await supertest(app)
-//       .post("/companies/")
-//       .send({ ...newCompany });
+    const response = await supertest(app)
+      .post("/companies/")
+      .send({ ...newCompany });
 
-//     expect(response.status).toBe(422);
-//     expect(response.body).toHaveProperty("errors");
-//     expect(response.body).toStrictEqual({
-//       errors: ["passwordHash is a required field"],
-//     });
-//   });
+    expect(response.status).toBe(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body).toStrictEqual({
+      errors: ["passwordHash is a required field"],
+    });
+  });
 
-//   it("Return: Body error, user already exists | Status code: 409", async () => {
-//     const response = await supertest(app)
-//       .post("/companies/")
-//       .send({ ...company });
+  it("Return: Body error, user already exists | Status code: 409", async () => {
+    const response = await supertest(app)
+      .post("/companies/")
+      .send({ ...company });
 
-//     expect(response.status).toBe(409);
-//     expect(response.body).toHaveProperty("error");
-//     expect(response.body).toStrictEqual({
-//       error: "Key cnpj or email or username already exists",
-//     });
-//   });
-// });
+    expect(response.status).toBe(409);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body).toStrictEqual({
+      error: "Key cnpj or email or username already exists",
+    });
+  });
+});
 
 // ! Commenting to isolate the error
 

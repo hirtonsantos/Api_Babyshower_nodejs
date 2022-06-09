@@ -9,7 +9,7 @@ const companyLoginController = async (req: Request, res: Response) => {
 
         const token = await companyLoginService({email, password})
 
-        return res.status(201).json({token})
+        return res.status(200).json({token})
         
     } catch (error) {
         
