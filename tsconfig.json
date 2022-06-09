@@ -13,8 +13,11 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "strictPropertyInitialization": false,
-    "skipLibCheck": true
-    /* "rootDir": "./src" */
-    /* "typeRoots": [] */
+    "skipLibCheck": true,
+    "useUnknownInCatchVariables": false
+    // "rootDir": "./src",
+    // ? Quando esse campo  é configurado, surgem inúmeros erros no jest (?).
+    // ! Para executar o app, esse campo deve ser descomentado.
+    // "typeRoots": ["./@types"]
   }
 }
