@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryColumn } from "typeorm";
+import { Entity, Column, PrimaryColumn, ManyToOne } from "typeorm";
 import { v4 as uuid } from "uuid"
+import { Chat } from "./chat.entity";
 
 @Entity("message")
 export class Message {
@@ -16,8 +17,8 @@ export class Message {
     @Column()
     parent_id: string
 
-    @Column()
-    chat_id: string
+    @ManyToOne(() => Chat, (chat) => chat)
+    chat: Chat
 
     constructor() {
         if (!this.id) {

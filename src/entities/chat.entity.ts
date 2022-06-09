@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, OneToMany, ManyToOne } from "typeorm";
+import { Entity, Column, PrimaryColumn, OneToMany } from "typeorm";
 import { v4 as uuid } from "uuid"
 import { Message } from "./messages.entity";
 
@@ -23,8 +23,11 @@ export class Chat {
     @Column()
     parent_id_retrieve: string
 
-    @ManyToOne(type => Message, message => message.chat_id)
+    @OneToMany(() => Message, (message) => message.chat, {
+        eager: true
+    })
     messages: Message[]
+
 
     constructor() {
         if (!this.id) {

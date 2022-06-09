@@ -23,27 +23,29 @@ const createMessageService = async (
 
   let chat;
 
-  if (!chatAlreadyExist) {
-    chat = new Chat();
-    chat.parent_id_main = user_id;
-    chat.parent_id_retrieve = other_parent_id;
+  chat = new Chat();
+  chat.parent_id_main = user_id;
+  chat.created_at = "28/08/1989"
+  chat.updated_at = "28/08/1989"
+  chat.parent_id_retrieve = other_parent_id; 
+  chatRepository.create(chat);
+  await chatRepository.save(chat);
 
-    // chatRepository.create(chat);
-    // await chatRepository.save(chat);
-  }
-
-  console.log(chat)
-
-  // create message
   const message = new Message();
   message.message = data.message
-  message.chat_id = chat?.id!
   message.parent_id = user_id
 
-  console.log(message)
-//   messageRepository.create(message)
-//   messageRepository.save(message)
+  messageRepository.create(message)
+  
+  await messageRepository.save(message)
 
+  chat.messages = [message]
+
+  console.log(chat.messages)
+
+  await chatRepository.save(chat);
+
+  console.log(chat.messages)
 
   return {"msg": "Mensagem enviada com sucesso!"}
 
