@@ -18,10 +18,10 @@ export class Chat {
     archived: boolean
 
     @Column()
-    parent_id_main: string
+    parent_user: string
 
     @Column()
-    parent_id_retrieve: string
+    other_parent_user: string
 
     @OneToMany(() => Message, (message) => message.chat, {
         eager: true

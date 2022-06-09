@@ -1,13 +1,12 @@
 import { Response, Request } from "express"
-import chatReadService from "../../services/chat/chatRead.service"
+import chatListService from "../../services/chat/chatList.service"
 
-const chatReadController = async (req: Request, res: Response) => {
+const chatListController = async (req: Request, res: Response) => {
     try {
 
-        const other_parent_id = "other_user00"
-        const user_id = "hirton00"
+        const user_id = "other_parent_id"
 
-        const data = await chatReadService(user_id, other_parent_id)
+        const data = await chatListService(user_id)
 
         return res.json(data)
         
@@ -18,4 +17,4 @@ const chatReadController = async (req: Request, res: Response) => {
     }
 }
 
-export default chatReadController
+export default chatListController

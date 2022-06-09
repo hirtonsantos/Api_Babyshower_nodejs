@@ -15,37 +15,39 @@ const createMessageService = async (
 
   const chatAlreadyExist = chat_list.find(
     (item) =>
-      item.parent_id_main === user_id &&
-      item.parent_id_retrieve === other_parent_id
+      item.parent_user === user_id &&
+      item.other_parent_user === other_parent_id
   );
 
   // create first chat
 
   let chat;
 
-  chat = new Chat();
-  chat.parent_id_main = user_id;
-  chat.created_at = "28/08/1989"
-  chat.updated_at = "28/08/1989"
-  chat.parent_id_retrieve = other_parent_id; 
-  chatRepository.create(chat);
-  await chatRepository.save(chat);
+  if (!chatAlreadyExist){
+    chat = new Chat();
+    chat.parent_user = user_id;
+    chat.created_at = new Date().toUTCString()
+    chat.updated_at = chat.created_at
+    chat.other_parent_user = other_parent_id; 
+    chat.messages = []
+    chatRepository.create(chat);
+    await chatRepository.save(chat);
+  } else {
+    chat = chatAlreadyExist
+    chat.updated_at = new Date().toUTCString()
+  }
+
 
   const message = new Message();
   message.message = data.message
   message.parent_id = user_id
 
   messageRepository.create(message)
-  
   await messageRepository.save(message)
 
-  chat.messages = [message]
-
-  console.log(chat.messages)
+  chat.messages.push(message)
 
   await chatRepository.save(chat);
-
-  console.log(chat.messages)
 
   return {"msg": "Mensagem enviada com sucesso!"}
 
