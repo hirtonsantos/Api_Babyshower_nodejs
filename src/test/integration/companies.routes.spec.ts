@@ -118,4 +118,12 @@ describe("Login company route | Integration Test", () => {
       Error: "User not authorized",
     });
   });
+
+  it("Return: Body error, incomplet keys | Status code: 400", async () => {
+    const { email } = payload;
+
+    const response = await supertest(app).post("/login").send({ email });
+
+    expect(response.status).toBe(400);
+  });
 });
