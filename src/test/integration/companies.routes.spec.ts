@@ -85,11 +85,7 @@ describe("Login company route | Integration Test", () => {
       });
 
     const companyRepo = connection.getRepository(Company);
-<<<<<<< HEAD
-    const { password, ...newPayload } = payload;
-=======
     const { passwordHash, ...newPayload } = payload;
->>>>>>> feature/companie_service
 
     company = await companyRepo.save({
       ...newPayload,

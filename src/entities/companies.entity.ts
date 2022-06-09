@@ -20,7 +20,7 @@ export class Company {
   @Column()
   razaoSocial: string;
 
-  @Column({ unique: true, length: 11 })
+  @Column({ unique: true, length: 14 })
   cnpj: string;
 
   @Column({ nullable: true })
@@ -34,8 +34,8 @@ export class Company {
   })
   adverts: Advert[];
 
-  comparePwd = async (pwdString: string): Promise<boolean> => {
-    return await compare(pwdString, this.passwordHash);
+  comparePwd = async (passwordString: string): Promise<boolean> => {
+    return await compare(passwordString, this.passwordHash);
   };
 
   constructor() {
