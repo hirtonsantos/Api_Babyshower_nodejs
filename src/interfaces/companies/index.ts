@@ -2,7 +2,7 @@ export interface ICompany {
   id: string;
   username: string;
   email: string;
-  password: string;
+  passwordHash: string;
   razaoSocial: string;
   cnpj: string;
   phone?: string;

@@ -8,7 +8,7 @@ export class Company {
   @PrimaryColumn("uuid")
   readonly id: string;
 
-  @Column()
+  @Column({ unique: true })
   username: string;
 
   @Column({ unique: true })

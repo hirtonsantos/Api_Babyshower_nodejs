@@ -8,44 +8,41 @@ const verifyUniqueValuesMW = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { username, email, cnpj } = req.body;
-
   const companyRepository = AppDataSource.getRepository(Company);
-  const companies = await companyRepository.find();
 
-  const usernameExists = companies.find(
-    (company) => company.username === username
-  );
-
-  // prettier-ignore
-  const emailExists = companies.find(
-        (company) => company.email === email
-    );
-
-  // prettier-ignore
-  const cnpjExists = companies.find(
-        (company) => company.cnpj === cnpj
-    );
+  const usernameExists = await companyRepository.findOne({
+    where: { username: req.validated.username },
+  });
 
   if (usernameExists) {
     return res.status(409).json({
-      message: "Username already exists",
+      error: "Key cnpj or email or username already exists",
     });
   }
+
+  // prettier-ignore
+  const emailExists = await companyRepository.findOne({
+    where: { email: req.validated.email },
+  });
 
   if (emailExists) {
     return res.status(409).json({
-      message: "Email already exists",
+      error: "Key cnpj or email or username already exists",
     });
   }
+
+  // prettier-ignore
+  const cnpjExists = await companyRepository.findOne({
+    where: { cnpj: req.validated.cnpj },
+  });
 
   if (cnpjExists) {
     return res.status(409).json({
-      message: "CNPJ already exists",
+      error: "Key cnpj or email or username already exists",
     });
   }
 
-  next();
+  return next();
 };
 
 export default verifyUniqueValuesMW;
