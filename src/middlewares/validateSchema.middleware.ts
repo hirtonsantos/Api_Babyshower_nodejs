@@ -14,7 +14,7 @@ const validateSchema =
 
       return next();
     } catch (err) {
-      return res.status(400).json({
+      return res.status(422).json({
         errors: err.errors,
       });
     }

@@ -16,7 +16,7 @@ const verifyUniqueValuesMW = async (
 
   if (usernameExists) {
     return res.status(409).json({
-      error: `Key (username)=(${req.validated.username}) already exists.`,
+      error: "Key cnpj or email or username already exists",
     });
   }
 
@@ -27,7 +27,7 @@ const verifyUniqueValuesMW = async (
 
   if (emailExists) {
     return res.status(409).json({
-      error: `Key (email)=(${req.validated.email}) already exists.`,
+      error: "Key cnpj or email or username already exists",
     });
   }
 
@@ -38,7 +38,7 @@ const verifyUniqueValuesMW = async (
 
   if (cnpjExists) {
     return res.status(409).json({
-      error: `Key (cnpj)=(${req.validated.cnpj}) already exists.`,
+      error: "Key cnpj or email or username already exists",
     });
   }
 

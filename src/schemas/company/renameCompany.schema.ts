@@ -24,8 +24,8 @@ const registerCompanySchema = yup.object().shape({
     .string()
     .required()
     .matches(/\d+/g, "CNPJ can only have numbers")
-    .min(11, "CNPJ must have 11 digits")
-    .max(11, "CNPJ must have 11 digits"),
+    .min(14, "CNPJ must have 14 digits")
+    .max(14, "CNPJ must have 14 digits"),
   phone: yup
     .string()
     .optional()
