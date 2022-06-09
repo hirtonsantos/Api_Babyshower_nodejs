@@ -3,9 +3,6 @@ import { AppDataSource } from "../../data-source"
 import { Company } from "../../entities/companies.entity"
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
-import { AppError, handleError } from "../../errors/appError"
-import { Request } from "express"
-
 
 const companyLoginService = async ({email, password}: ICompanyLogin) => {
     try{

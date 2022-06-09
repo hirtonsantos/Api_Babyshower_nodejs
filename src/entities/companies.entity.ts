@@ -1,4 +1,3 @@
-import { compare } from "bcrypt";
 import { Entity, Column, PrimaryColumn, OneToMany } from "typeorm";
 import { v4 as uuid } from "uuid";
 import { Advert } from "./adverts.entity";
@@ -33,10 +32,6 @@ export class Company {
     eager: true,
   })
   adverts: Advert[];
-
-  comparePwd = async (passwordString: string): Promise<boolean> => {
-    return await compare(passwordString, this.passwordHash);
-  };
 
   constructor() {
     if (!this.id) {
