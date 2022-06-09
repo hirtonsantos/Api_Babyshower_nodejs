@@ -2,6 +2,7 @@ import {ICompanyLogin} from "../../interfaces/companies"
 import { AppDataSource } from "../../data-source"
 import { Company } from "../../entities/companies.entity"
 import jwt from "jsonwebtoken"
+import { AppError, handleError } from "../../errors/appError"
 
 
 const companyLoginService = async ({email, password}: ICompanyLogin) => {
@@ -28,7 +29,7 @@ const companyLoginService = async ({email, password}: ICompanyLogin) => {
         return token
         
     } catch (error) {
-        return {err: error}        
+        return {error: error}       
     }
 }
 
