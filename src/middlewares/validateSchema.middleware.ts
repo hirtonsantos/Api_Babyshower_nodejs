@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { AnySchema } from "yup";
+import { Company } from "../entities/companies.entity";
 
 const validateSchema =
   (schema: AnySchema) =>
@@ -10,7 +11,7 @@ const validateSchema =
         stripUnknown: true,
       });
 
-      req.validated = validated;
+      req.validated = validated as Company;
 
       return next();
     } catch (err) {
