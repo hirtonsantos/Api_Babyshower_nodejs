@@ -1,5 +1,6 @@
 import {
   generateAdministrator,
+  generateAdvert,
   generateCompany,
   generateToken,
   IAdministrator,
@@ -402,6 +403,183 @@ describe("Get company route | Integration Test", () => {
     expect(response.status).toBe(401);
     expect(response.body).toStrictEqual({
       Message: "Company not found",
+    });
+  });
+});
+
+describe("Update company route | Integration Test", () => {
+  let connection: DataSource;
+
+  let tokenAdm: string;
+  let tokenCompany: string;
+  let adm: Administrator;
+  let company: Company;
+  let otherCompany: Company;
+
+  beforeAll(async () => {
+    await AppDataSource.initialize()
+      .then((res) => (connection = res))
+      .catch((err) => {
+        console.error("Error during Data Source initialization", err);
+      });
+    //add admnistrator
+    const admRepo = connection.getRepository(Administrator);
+    adm = Object.assign(new Administrator(), () => {
+      const { password, ...newPayload } = generateAdministrator();
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    });
+    adm = await admRepo.save(adm);
+    tokenAdm = generateToken(adm.id as string);
+
+    //add company
+    const companyRepo = connection.getRepository(Company);
+    company = Object.assign(new Company(), () => {
+      const { password, ...newPayload } = generateCompany();
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    });
+    company = await companyRepo.save(company);
+    tokenCompany = generateToken(company.id as string);
+
+    //add other company
+    otherCompany = Object.assign(new Company(), () => {
+      const { password, ...newPayload } = generateCompany();
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    });
+  });
+
+  afterAll(async () => {
+    await connection.destroy();
+  });
+
+  it("Return: User as JSON response | Status code: 204", async () => {
+    const newInformation = generateCompany();
+
+    const response = await supertest(app)
+      .patch(`/companies/${company.id}`)
+      .set("Authorization", "Bearer " + tokenCompany)
+      .send({ ...newInformation });
+
+    const { password, ...newCompany } = newInformation;
+
+    const companyRepo = connection.getRepository(Company);
+    const updatedCompany = await companyRepo.findOneBy({ id: company.id });
+
+    expect(response.status).toBe(204);
+    expect(updatedCompany).toEqual(expect.objectContaining({ ...newCompany }));
+  });
+
+  it("Return: Body error, missing token | Status code: 400", async () => {
+    const response = await supertest(app)
+      .patch(`/companies/${company.id}`)
+      .send({ ...generateCompany() });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty("message");
+    expect(response.body).toStrictEqual({
+      message: "Missing authorization token.",
+    });
+  });
+
+  it("Return: Body error, invalid information | Status code: 400", async () => {
+    const newInformation = { email: "teste", cnpj: "1263" };
+
+    const response = await supertest(app)
+      .patch(`/companies/${company.id}`)
+      .set("Authorization", "Bearer " + tokenCompany)
+      .send({ ...newInformation });
+
+    expect(response.status).toBe(400);
+  });
+
+  it("Return: Body error, invalid token | Status code: 401", async () => {
+    const token = "invalidToken";
+
+    const response = await supertest(app)
+      .patch(`/companies/${company.id}`)
+      .set("Authorization", "Bearer " + token)
+      .send({ ...generateCompany() });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
+  });
+
+  it("Return: Body error, no permision | Status code: 403", async () => {
+    const response = await supertest(app)
+      .patch(`/companies/${otherCompany.id}`)
+      .set("Authorization", "Bearer " + tokenCompany)
+      .send({ ...generateCompany() });
+
+    expect(response.status).toBe(403);
+    expect(response.body).toStrictEqual({
+      Error: "You can't access information of another company",
+    });
+  });
+
+  it("Return: Body error, company not Found | Status code: 404", async () => {
+    const response = await supertest(app)
+      .patch(`/companies/${adm.id}`)
+      .set("Authorization", "Bearer " + tokenCompany)
+      .send({ ...generateCompany() });
+
+    expect(response.status).toBe(404);
+    expect(response.body).toStrictEqual({
+      Message: "Company not found",
+    });
+  });
+
+  it("Return: Body error, updating duplicate email | Status code: 409", async () => {
+    const newInformation = { ...generateCompany(), email: otherCompany.email };
+
+    const response = await supertest(app)
+      .patch(`/users/${company.id}`)
+      .set("Authorization", "Bearer " + tokenCompany)
+      .send({ ...newInformation });
+
+    expect(response.status).toBe(409);
+    expect(response.body).toStrictEqual({
+      message: "User already exists",
+    });
+  });
+
+  it("Return: Body error, updating duplicate cnpj | Status code: 409", async () => {
+    const newInformation = { ...generateCompany(), email: otherCompany.cnpj };
+
+    const response = await supertest(app)
+      .patch(`/users/${company.id}`)
+      .set("Authorization", "Bearer " + tokenCompany)
+      .send({ ...newInformation });
+
+    expect(response.status).toBe(409);
+    expect(response.body).toStrictEqual({
+      message: "User already exists",
+    });
+  });
+
+  it("Return: Body error, updating duplicate username | Status code: 409", async () => {
+    const newInformation = {
+      ...generateCompany(),
+      email: otherCompany.username,
+    };
+
+    const response = await supertest(app)
+      .patch(`/users/${company.id}`)
+      .set("Authorization", "Bearer " + tokenCompany)
+      .send({ ...newInformation });
+
+    expect(response.status).toBe(409);
+    expect(response.body).toStrictEqual({
+      message: "User already exists",
     });
   });
 });
