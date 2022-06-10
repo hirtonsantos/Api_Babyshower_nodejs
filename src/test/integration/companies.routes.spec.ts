@@ -100,8 +100,6 @@ describe("Login company route | Integration Test", () => {
       .post("/companies/login")
       .send({ email, password });
 
-    console.log(response.body);
-
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("access_token");
     expect(

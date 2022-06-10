@@ -1,8 +1,13 @@
 import { faker } from "@faker-js/faker";
 import jwt from "jsonwebtoken";
+import { Administrator } from "../entities/administrators.entity";
 import { Company } from "../entities/companies.entity";
 
 export interface ICompany extends Partial<Company> {
+  password: string;
+}
+
+export interface IAdministrator extends Partial<Administrator> {
   password: string;
 }
 
@@ -21,7 +26,13 @@ const generateCompany = (): Partial<ICompany> => {
 const generateAdvert = () => {};
 
 //Aqui é o payload, como o dado entra no request antes do schema
-const generateAdministrator = () => {};
+const generateAdministrator = () => {
+  const username = faker.internet.userName().toLowerCase();
+  const email = faker.internet.email(username).toLocaleLowerCase();
+  const password = faker.random.numeric(8);
+
+  return { username, email, password };
+};
 
 //Aqui é o payload, como o dado entra no request antes do schema
 const generateMessage = () => {};
