@@ -1,9 +1,7 @@
 import {
   generateAdministrator,
-  generateAdvert,
   generateCompany,
   generateToken,
-  IAdministrator,
   ICompany,
 } from "..";
 import { Company } from "../../entities/companies.entity";
@@ -460,7 +458,7 @@ describe("Update company route | Integration Test", () => {
     await connection.destroy();
   });
 
-  it("Return: User as JSON response | Status code: 204", async () => {
+  it("Return: No body response | Status code: 204", async () => {
     const newInformation = generateCompany();
 
     const response = await supertest(app)
@@ -483,9 +481,8 @@ describe("Update company route | Integration Test", () => {
       .send({ ...generateCompany() });
 
     expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty("message");
     expect(response.body).toStrictEqual({
-      message: "Missing authorization token.",
+      Error: "Missing authorization token.",
     });
   });
 
@@ -548,7 +545,7 @@ describe("Update company route | Integration Test", () => {
 
     expect(response.status).toBe(409);
     expect(response.body).toStrictEqual({
-      message: "User already exists",
+      Error: "Key cnpj or email or username already exists",
     });
   });
 
@@ -562,7 +559,7 @@ describe("Update company route | Integration Test", () => {
 
     expect(response.status).toBe(409);
     expect(response.body).toStrictEqual({
-      message: "User already exists",
+      Error: "Key cnpj or email or username already exists",
     });
   });
 
@@ -579,7 +576,117 @@ describe("Update company route | Integration Test", () => {
 
     expect(response.status).toBe(409);
     expect(response.body).toStrictEqual({
-      message: "User already exists",
+      Error: "Key cnpj or email or username already exists",
+    });
+  });
+});
+
+describe("Delete company route | Integration Test", () => {
+  let connection: DataSource;
+
+  let tokenAdm: string;
+  let tokenCompany: string;
+  let adm: Administrator;
+  let company: Company;
+  let otherCompany: Company;
+
+  beforeAll(async () => {
+    await AppDataSource.initialize()
+      .then((res) => (connection = res))
+      .catch((err) => {
+        console.error("Error during Data Source initialization", err);
+      });
+    //add admnistrator
+    const admRepo = connection.getRepository(Administrator);
+    adm = Object.assign(new Administrator(), () => {
+      const { password, ...newPayload } = generateAdministrator();
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    });
+    adm = await admRepo.save(adm);
+    tokenAdm = generateToken(adm.id as string);
+
+    //add company
+    const companyRepo = connection.getRepository(Company);
+    company = Object.assign(new Company(), () => {
+      const { password, ...newPayload } = generateCompany();
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    });
+    company = await companyRepo.save(company);
+    tokenCompany = generateToken(company.id as string);
+
+    //add other company
+    otherCompany = Object.assign(new Company(), () => {
+      const { password, ...newPayload } = generateCompany();
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    });
+  });
+
+  afterAll(async () => {
+    await connection.destroy();
+  });
+
+  it("Return: no body response | Status code: 204", async () => {
+    const response = await supertest(app)
+      .delete(`/companies/${company.id}`)
+      .set("Authorization", "Bearer " + tokenCompany);
+
+    const companyRepo = connection.getRepository(Company);
+    const deletedCompany = await companyRepo.findOneBy({ id: company.id });
+
+    expect(response.status).toBe(204);
+    expect(deletedCompany).toBeFalsy;
+  });
+
+  it("Return: Body error, missing token | Status code: 400", async () => {
+    const response = await supertest(app).delete(`/companies/${company.id}`);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({
+      Error: "Missing authorization token.",
+    });
+  });
+
+  it("Return: Body error, invalid token | Status code: 401", async () => {
+    const token = "invalidToken";
+
+    const response = await supertest(app)
+      .delete(`/companies/${company.id}`)
+      .set("Authorization", "Bearer " + token);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
+  });
+
+  it("Return: Body error, no permision | Status code: 403", async () => {
+    const response = await supertest(app)
+      .delete(`/companies/${otherCompany.id}`)
+      .set("Authorization", "Bearer " + tokenCompany);
+
+    expect(response.status).toBe(403);
+    expect(response.body).toStrictEqual({
+      Error: "You can't access information of another company",
+    });
+  });
+
+  it("Return: Body error, company not Found | Status code: 404", async () => {
+    const response = await supertest(app)
+      .delete(`/companies/${adm.id}`)
+      .set("Authorization", "Bearer " + tokenCompany);
+
+    expect(response.status).toBe(404);
+    expect(response.body).toStrictEqual({
+      Message: "Company not found",
     });
   });
 });
