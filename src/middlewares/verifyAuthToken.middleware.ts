@@ -27,5 +27,4 @@ export const authUser = (req: Request, res: Response, next: NextFunction) => {
         }
     }
 
-
 }
