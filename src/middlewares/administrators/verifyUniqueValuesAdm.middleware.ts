@@ -16,7 +16,7 @@ const verifyUniqueValuesAdmin = async (
 
   if (usernameExists) {
     return res.status(409).json({
-      error: "Username already exists",
+      "Error": "Key email or username already exists",
     });
   }
 
@@ -26,7 +26,7 @@ const verifyUniqueValuesAdmin = async (
 
   if (emailExists) {
     return res.status(409).json({
-      error: "Email already exists",
+      "Error": "Key email or username already exists",
     });
   }
   return next();
