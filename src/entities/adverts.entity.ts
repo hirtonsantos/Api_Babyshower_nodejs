@@ -17,8 +17,11 @@ export class Advert {
   @Column()
   description: string;
 
-  @Column({ unique: true })
+  @Column()
   linkAdverts: string;
+
+  @Column()
+  image: string;
 
   @ManyToOne((type) => Company, (company) => company.adverts)
   company: Company;
