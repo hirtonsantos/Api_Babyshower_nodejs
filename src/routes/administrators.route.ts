@@ -18,7 +18,7 @@ const routes = Router();
 export const administratorRoutes = () => {
   routes.post("/", 
     validateToken,
-    verifyIfAdm,
+    // verifyIfAdm,
     validateSchema(registerAdminSchema),
     verifyUniqueValuesAdmin, 
     adminstradorRegisterController

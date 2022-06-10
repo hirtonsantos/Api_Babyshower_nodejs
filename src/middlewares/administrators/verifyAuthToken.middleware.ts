@@ -18,7 +18,7 @@ const validateToken = async (
     process.env.SECRET_KEY as string,
     (err: any, decoded: any ) => {
       if (err) {
-        throw new AppError(400, {"Error": "Invalid Token."});
+        throw new AppError(401, {"Error": "Invalid Token."});
       }
 
       req.decoded = decoded ;
