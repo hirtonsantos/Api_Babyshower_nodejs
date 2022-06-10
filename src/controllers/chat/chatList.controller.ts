@@ -1,4 +1,5 @@
 import { Response, Request } from "express"
+import { AppError, handleError } from "../../errors/appError"
 import chatListService from "../../services/chat/chatList.service"
 
 const chatListController = async (req: Request, res: Response) => {
@@ -11,8 +12,8 @@ const chatListController = async (req: Request, res: Response) => {
         return res.json(data)
         
     } catch (error) {
-        if (error instanceof Error) {
-            throw new Error(error.message)
+        if (error instanceof AppError) {
+            handleError(error, res)
         }
     }
 }

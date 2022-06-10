@@ -1,6 +1,7 @@
 import { AppDataSource } from "../../data-source";
 import { Chat } from "../../entities/chat.entity";
 import { Message } from "../../entities/messages.entity";
+import { AppError } from "../../errors/appError";
 
 const chatReadService = async (
   chat_id: string,
@@ -15,6 +16,8 @@ const chatReadService = async (
     where: {
       id: chat_id,
     }
+  }).catch((_) => {
+    throw new AppError(404, "Chat not found")
   })
 
   const chatCurrent = chat[0]

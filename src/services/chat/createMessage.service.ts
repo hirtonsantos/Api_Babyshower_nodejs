@@ -37,7 +37,6 @@ const createMessageService = async (
   }
 
   const message = new Message();
-  // message.createdAt = new Date().toUTCString();
   message.message = data.message;
   message.parent_id = user_id;
   message.chat = chat;

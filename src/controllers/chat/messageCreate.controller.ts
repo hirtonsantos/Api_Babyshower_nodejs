@@ -1,4 +1,5 @@
 import { Response, Request } from "express"
+import { AppError, handleError } from "../../errors/appError"
 import createMessageService from "../../services/chat/createMessage.service"
 
 const createMessageController = async (req: Request, res: Response) => {
@@ -13,8 +14,8 @@ const createMessageController = async (req: Request, res: Response) => {
         return res.json(messageData)
         
     } catch (error) {
-        if (error instanceof Error) {
-            throw new Error(error.message)
+        if (error instanceof AppError) {
+            handleError(error, res)
         }
     }
 }
