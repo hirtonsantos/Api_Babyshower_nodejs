@@ -1,4 +1,10 @@
-import { generateCompany, generateToken, ICompany } from "..";
+import {
+  generateAdministrator,
+  generateCompany,
+  generateToken,
+  IAdministrator,
+  ICompany,
+} from "..";
 import { Company } from "../../entities/companies.entity";
 import supertest from "supertest";
 import app from "../../app";
@@ -7,6 +13,7 @@ import { DataSource } from "typeorm";
 import { AppDataSource } from "../../data-source";
 import { hashSync } from "bcrypt";
 import { verify } from "jsonwebtoken";
+import { Administrator } from "../../entities/administrators.entity";
 
 describe("Create company route | Integration Test", () => {
   let connection: DataSource;
@@ -131,10 +138,13 @@ describe("Login company route | Integration Test", () => {
   });
 });
 
-/* describe("Get companies route | Integration Test", () => {
+describe("Get companies route | Integration Test", () => {
   let connection: DataSource;
 
-  let companies: Companie[];
+  let companies: Company[];
+  let tokenCompany: string;
+  let tokenAdm: string;
+  let newCompany: Company;
 
   beforeAll(async () => {
     await AppDataSource.initialize()
@@ -143,16 +153,44 @@ describe("Login company route | Integration Test", () => {
         console.error("Error during Data Source initialization", err);
       });
 
-    const companyRepo = connection.getRepository(Companie);
+    //insert adm
+    const administratorRepo = connection.getRepository(Administrator);
+    let newAdm = Object.assign(new Administrator(), () => {
+      const { password, ...newPayload } = generateAdministrator();
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    });
+    newAdm = await administratorRepo.save(newAdm);
+    tokenAdm = generateToken(newAdm.id as string);
 
-    for (let i = 1; i < 10; i++) {
+    //insert logged company
+    const companyRepo = connection.getRepository(Company);
+    newCompany = Object.assign(new Company(), () => {
       const { password, ...newPayload } = generateCompany();
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    });
+    newCompany = await administratorRepo.save(newCompany);
+    companies.push(newCompany);
+    tokenCompany = generateToken(newCompany.id as string);
 
+    //insert 9 others companies
+    for (let i = 1; i < 9; i++) {
+      const { password, ...newPayload } = generateCompany();
       companies.push(
-        await companyRepo.save({
-          ...newPayload,
-          passwordHash: hashSync(password as string, 8),
-        })
+        await companyRepo.save(
+          Object.assign(new Company(), () => {
+            const { password, ...newPayload } = generateCompany();
+            return {
+              ...newPayload,
+              passwordHash: "passwordHash",
+            };
+          })
+        )
       );
     }
   });
@@ -161,11 +199,51 @@ describe("Login company route | Integration Test", () => {
     await connection.destroy();
   });
 
-  //OS TESTES COMENTADOS SÓ SERÃO CONCLUÍDOS APÓS ENTITY ADMINISTRATOR ESTAR CONCLÚIDA
+  it("Return: Users as JSON response | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get("/companies")
+      .set("Authorization", "Bearer " + tokenAdm);
+    const { passwordHash, adverts, ...company } = newCompany;
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(8);
+    expect(response.body[0]).toEqual(
+      expect.objectContaining({
+        ...company,
+        adverts: `/adverts/byCompany/${company.id}`,
+      })
+    );
+  });
 
-  it("Return: Users as JSON response | Status code: 200", async () => {});
+  it("Return: Users as JSON response page 2 | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get("/companies?page=2")
+      .set("Authorization", "Bearer " + tokenAdm);
+    const { passwordHash, adverts, ...company } = newCompany;
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(2);
+  });
 
-  it("Return: Users as JSON response page 2 | Status code: 200", async () => {});
+  it("Return: Users as JSON response perPage 4 | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get("/companies?page=2")
+      .set("Authorization", "Bearer " + tokenAdm);
+    const { passwordHash, adverts, ...company } = newCompany;
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(4);
+  });
+
+  it("Return: Users as JSON response page 2 perPage 4 | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get("/companies?page=2")
+      .set("Authorization", "Bearer " + tokenAdm);
+    const { passwordHash, adverts, ...company } = newCompany;
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(5);
+  });
 
   it("Return: Body error, missing token | Status code: 400", async () => {
     const response = await supertest(app).get("/companies");
@@ -189,15 +267,13 @@ describe("Login company route | Integration Test", () => {
   });
 
   it("Return: Body error, no permision | Status code: 401", async () => {
-    const token = generateToken(company.id);
-
     const response = await supertest(app)
       .get("/companies")
-      .set("Authorization", "Bearer " + token);
+      .set("Authorization", "Bearer " + tokenCompany);
 
     expect(response.status).toBe(401);
     expect(response.body).toStrictEqual({
       Error: "You are not allowed to access this information",
     });
   });
-}); */
+});
