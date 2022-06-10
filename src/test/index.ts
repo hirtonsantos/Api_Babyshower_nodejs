@@ -14,7 +14,6 @@ export interface IAdministrator extends Partial<Administrator> {
 
 export interface IAdvert extends Partial<Omit<Advert, "category">> {
   category: string;
-  image: string;
 }
 
 //Aqui é o payload, como o dado entra no request antes do schema
