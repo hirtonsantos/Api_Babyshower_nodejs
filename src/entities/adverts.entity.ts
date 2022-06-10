@@ -11,14 +11,17 @@ export class Advert {
   @Column()
   title: string;
 
-  @Column("float", { unique: true })
+  @Column("float")
   apliedPrice: number;
 
   @Column()
   description: string;
 
-  @Column({ unique: true })
+  @Column({ nullable: true })
   linkAdverts: string;
+
+  @Column({ nullable: true })
+  image: string;
 
   @ManyToOne((type) => Company, (company) => company.adverts)
   company: Company;
