@@ -2,7 +2,11 @@ import { Entity, Column, PrimaryColumn, ManyToOne } from "typeorm";
 import { v4 as uuid } from "uuid"
 import { Chat } from "./chat.entity";
 
-@Entity("message")
+@Entity("message", {
+    orderBy: {
+        createdAt: "DESC",
+    },
+})
 export class Message {
 
     @PrimaryColumn("uuid")
