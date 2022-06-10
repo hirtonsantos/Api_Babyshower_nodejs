@@ -138,3 +138,94 @@ describe("Create administrator route | Integration Test", () => {
     });
   });
 });
+
+describe("Login administrator route | Integration Test", () => {
+  let connection: DataSource;
+
+  let payload = generateAdministrator();
+  let administrator: Administrator;
+
+  beforeAll(async () => {
+    await AppDataSource.initialize()
+      .then((res) => (connection = res))
+      .catch((err) => {
+        console.error("Error during Data Source initialization", err);
+      });
+
+    const administratorRepo = connection.getRepository(Administrator);
+    const { password, ...newPayload } = payload;
+
+    administrator = Object.assign(new Administrator(), {
+      ...newPayload,
+      passwordHash: hashSync(password as string, 8),
+    });
+    administrator = await administratorRepo.save(administrator);
+  });
+
+  afterAll(async () => {
+    await connection.destroy();
+  });
+
+  it("Return: token as JSON response | Status code: 200", async () => {
+    const { email, password } = payload;
+
+    const response = await supertest(app)
+      .post("/administrators/login")
+      .send({ email, password });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty("id");
+    expect(response.body).toHaveProperty("access_token");
+    expect(
+      verify(response.body.access_token, process.env.SECRET_KEY as string)
+    ).toBeTruthy();
+  });
+
+  it("Return: token as JSON response | Status code: 200", async () => {
+    const { username, password } = payload;
+
+    const response = await supertest(app)
+      .post("/administrators/login")
+      .send({ username, password });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty("id");
+    expect(response.body).toHaveProperty("access_token");
+    expect(
+      verify(response.body.access_token, process.env.SECRET_KEY as string)
+    ).toBeTruthy();
+  });
+
+  it("Return: Body error, invalid credentials | Status code: 401", async () => {
+    const { email } = payload;
+
+    const response = await supertest(app)
+      .post("/administrators/login")
+      .send({ email, password: "wrongPassword" });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toStrictEqual({
+      Error: "User not authorized",
+    });
+  });
+
+  it("Return: Body error, incomplet keys | Status code: 400", async () => {
+    const { email } = payload;
+
+    const response = await supertest(app)
+      .post("/administrators/login")
+      .send({ email });
+
+    expect(response.status).toBe(400);
+  });
+
+  it("Return: Body error, incomplet keys | Status code: 400", async () => {
+    const { password } = payload;
+
+    const response = await supertest(app)
+      .post("/administrators/login")
+      .send({ password });
+
+    expect(response.status).toBe(400);
+  });
+});
