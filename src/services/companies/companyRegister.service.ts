@@ -6,14 +6,7 @@ import { serializedCreateUserSchema } from "../../schemas/company/renameCompany.
 const companyRegisterService = async ({ validated }: Request) => {
   const companyRepository = AppDataSource.getRepository(Company);
 
-  const company = new Company();
-  company.username = validated.username;
-  company.email = validated.email;
-  company.passwordHash = validated.passwordHash;
-  company.razaoSocial = validated.razaoSocial;
-  company.cnpj = validated.cnpj;
-  company.phone = validated.phone;
-  company.logoImage = validated.logoImage;
+  const company = Object.assign(new Company(), validated);
 
   await companyRepository.save(company);
 

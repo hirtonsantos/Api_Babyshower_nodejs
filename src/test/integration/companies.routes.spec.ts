@@ -7,7 +7,6 @@ import { DataSource } from "typeorm";
 import { AppDataSource } from "../../data-source";
 import { hashSync } from "bcrypt";
 import { verify } from "jsonwebtoken";
-import { endsWith } from "lodash";
 
 describe("Create company route | Integration Test", () => {
   let connection: DataSource;
@@ -27,7 +26,7 @@ describe("Create company route | Integration Test", () => {
   const company: Partial<ICompany> = generateCompany();
 
   it("Return: Company as JSON reponse | Status code 201", async () => {
-    const { passwordHash, ...newCompany } = company;
+    const { password, ...newCompany } = company;
 
     const response = await supertest(app)
       .post("/companies")
@@ -40,19 +39,17 @@ describe("Create company route | Integration Test", () => {
     expect(response.body).toEqual(expect.objectContaining({ ...newCompany }));
   });
 
-  it("Return: Body error, missing password | Status code: 422", async () => {
-    const { passwordHash, ...newCompany } = company;
+  it("Return: Body error, missing password | Status code: 400", async () => {
+    const { password, ...newCompany } = company;
 
     const response = await supertest(app)
       .post("/companies/")
       .send({ ...newCompany });
 
-    console.log(response.body);
-
-    expect(response.status).toBe(422);
+    expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("errors");
     expect(response.body).toStrictEqual({
-      errors: ["passwordHash is a required field"],
+      errors: ["password is a required field"],
     });
   });
 
@@ -60,8 +57,6 @@ describe("Create company route | Integration Test", () => {
     const response = await supertest(app)
       .post("/companies/")
       .send({ ...company });
-
-    console.log(response.body);
 
     expect(response.status).toBe(409);
     expect(response.body).toHaveProperty("error");
@@ -71,9 +66,6 @@ describe("Create company route | Integration Test", () => {
   });
 });
 
-// ! Commenting to isolate the error
-
-/* 
 describe("Login company route | Integration Test", () => {
   let connection: DataSource;
 
@@ -88,12 +80,13 @@ describe("Login company route | Integration Test", () => {
       });
 
     const companyRepo = connection.getRepository(Company);
-    const { passwordHash, ...newPayload } = payload;
+    const { password, ...newPayload } = payload;
 
-    company = await companyRepo.save({
+    company = Object.assign(new Company(), {
       ...newPayload,
-      passwordHash: hashSync(passwordHash as string, 8),
+      passwordHash: hashSync(password as string, 8),
     });
+    company = await companyRepo.save(company);
   });
 
   afterAll(async () => {
@@ -101,11 +94,11 @@ describe("Login company route | Integration Test", () => {
   });
 
   it("Return: token as JSON response | Status code: 200", async () => {
-    const { email, passwordHash } = payload;
+    const { email, password } = payload;
 
     const response = await supertest(app)
       .post("/companies/login")
-      .send({ email, passwordHash });
+      .send({ email, password });
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("access_token");
@@ -118,7 +111,7 @@ describe("Login company route | Integration Test", () => {
     const { email } = payload;
 
     const response = await supertest(app)
-      .post("/login")
+      .post("/companies/login")
       .send({ email, password: "wrongPassword" });
 
     expect(response.status).toBe(401);
@@ -130,12 +123,14 @@ describe("Login company route | Integration Test", () => {
   it("Return: Body error, incomplet keys | Status code: 400", async () => {
     const { email } = payload;
 
-    const response = await supertest(app).post("/login").send({ email });
+    const response = await supertest(app)
+      .post("/companies/login")
+      .send({ email });
 
     expect(response.status).toBe(400);
   });
 });
- */
+
 /* describe("Get companies route | Integration Test", () => {
   let connection: DataSource;
 
