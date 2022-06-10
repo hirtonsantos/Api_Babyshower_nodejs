@@ -14,8 +14,9 @@ export class Message {
     @Column("boolean", {default: false})
     read_message: boolean
 
-    @Column()
-    createdAt: string
+    @Column({ type: 'timestamptz' , default: () => 'NOW()',})
+    createdAt: Date
+    
 
     @Column()
     parent_id: number

@@ -11,7 +11,7 @@ const chatReadService = async (chat_id: string, user_id: number) => {
   })
 
   chat?.messages.map(async (msg) => {
-    if (msg.parent_id !== 1) {
+    if (msg.parent_id !== user_id && chat.other_parent_user === user_id) {
       const msg_item = await msgRepository.findOneBy({
         id: msg.id,
       })

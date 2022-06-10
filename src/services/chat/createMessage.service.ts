@@ -37,7 +37,7 @@ const createMessageService = async (
   }
 
   const message = new Message();
-  message.createdAt = new Date().toUTCString();
+  // message.createdAt = new Date().toUTCString();
   message.message = data.message;
   message.parent_id = user_id;
   message.chat = chat;
@@ -49,9 +49,12 @@ const createMessageService = async (
 
   await chatRepository.save(chat);
 
+  const { createdAt, ...messageCreated } = message
+
   return {
     msgSucess: "Mensagem enviada com sucesso!",
-    ...message,
+    createdAt: message.createdAt.toUTCString(),
+    ...messageCreated,
     chat: `/chat/${message.chat.id}`,
   };
 };
