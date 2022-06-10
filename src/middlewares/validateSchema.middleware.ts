@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { AnySchema } from "yup";
 import { Company } from "../entities/companies.entity";
+import { ICompany } from "../interfaces/companies";
 
 const validateSchema =
   (schema: AnySchema) =>
@@ -11,11 +12,11 @@ const validateSchema =
         stripUnknown: true,
       });
 
-      req.validated = validated as Company;
+      req.validated = validated;
 
       return next();
     } catch (err) {
-      return res.status(422).json({
+      return res.status(400).json({
         errors: err.errors,
       });
     }

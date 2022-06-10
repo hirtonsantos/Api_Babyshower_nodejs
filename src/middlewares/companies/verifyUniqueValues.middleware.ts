@@ -11,7 +11,7 @@ const verifyUniqueValuesMW = async (
   const companyRepository = AppDataSource.getRepository(Company);
 
   const usernameExists = await companyRepository.findOne({
-    where: { username: req.validated.username },
+    where: { username: (req.validated as Company).username },
   });
 
   if (usernameExists) {
@@ -22,7 +22,7 @@ const verifyUniqueValuesMW = async (
 
   // prettier-ignore
   const emailExists = await companyRepository.findOne({
-    where: { email: req.validated.email },
+    where: { email: (req.validated as Company).email },
   });
 
   if (emailExists) {
@@ -33,7 +33,7 @@ const verifyUniqueValuesMW = async (
 
   // prettier-ignore
   const cnpjExists = await companyRepository.findOne({
-    where: { cnpj: req.validated.cnpj },
+    where: { cnpj: (req.validated as Company).cnpj },
   });
 
   if (cnpjExists) {
