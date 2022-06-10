@@ -42,6 +42,7 @@ describe("Create company route | Integration Test", () => {
     expect(response.status).toBe(201);
     expect(response.body).toHaveProperty(["id"]);
     expect(response.body).toHaveProperty(["phone"]);
+    expect(response.body).not.toHaveProperty("passwordHash");
     expect(validate(response.body.id)).toBeTruthy();
     expect(response.body).toEqual(expect.objectContaining({ ...newCompany }));
   });
@@ -199,11 +200,11 @@ describe("Get companies route | Integration Test", () => {
     await connection.destroy();
   });
 
-  it("Return: Users as JSON response | Status code: 200", async () => {
+  it("Return: Companies as JSON response | Status code: 200", async () => {
     const response = await supertest(app)
       .get("/companies")
       .set("Authorization", "Bearer " + tokenAdm);
-    const { passwordHash, adverts, ...company } = newCompany;
+    const { passwordHash, adverts, comparePwd, ...company } = newCompany;
     expect(response.status).toBe(200);
     expect(response.body).toBeInstanceOf(Array);
     expect(response.body).toHaveLength(8);
@@ -215,31 +216,31 @@ describe("Get companies route | Integration Test", () => {
     );
   });
 
-  it("Return: Users as JSON response page 2 | Status code: 200", async () => {
+  it("Return: Companies as JSON response page 2 | Status code: 200", async () => {
     const response = await supertest(app)
       .get("/companies?page=2")
       .set("Authorization", "Bearer " + tokenAdm);
-    const { passwordHash, adverts, ...company } = newCompany;
+    const { passwordHash, adverts, comparePwd, ...company } = newCompany;
     expect(response.status).toBe(200);
     expect(response.body).toBeInstanceOf(Array);
     expect(response.body).toHaveLength(2);
   });
 
-  it("Return: Users as JSON response perPage 4 | Status code: 200", async () => {
+  it("Return: Companies as JSON response perPage 4 | Status code: 200", async () => {
     const response = await supertest(app)
       .get("/companies?page=2")
       .set("Authorization", "Bearer " + tokenAdm);
-    const { passwordHash, adverts, ...company } = newCompany;
+    const { passwordHash, adverts, comparePwd, ...company } = newCompany;
     expect(response.status).toBe(200);
     expect(response.body).toBeInstanceOf(Array);
     expect(response.body).toHaveLength(4);
   });
 
-  it("Return: Users as JSON response page 2 perPage 4 | Status code: 200", async () => {
+  it("Return: Companies as JSON response page 2 perPage 4 | Status code: 200", async () => {
     const response = await supertest(app)
       .get("/companies?page=2")
       .set("Authorization", "Bearer " + tokenAdm);
-    const { passwordHash, adverts, ...company } = newCompany;
+    const { passwordHash, adverts, comparePwd, ...company } = newCompany;
     expect(response.status).toBe(200);
     expect(response.body).toBeInstanceOf(Array);
     expect(response.body).toHaveLength(5);
@@ -274,6 +275,133 @@ describe("Get companies route | Integration Test", () => {
     expect(response.status).toBe(401);
     expect(response.body).toStrictEqual({
       Error: "You are not allowed to access this information",
+    });
+  });
+});
+
+describe("Get company route | Integration Test", () => {
+  let connection: DataSource;
+
+  let tokenCompany: string;
+  let tokenAdm: string;
+  let tokenOtherCompany: string;
+  let newCompany: Company;
+
+  beforeAll(async () => {
+    await AppDataSource.initialize()
+      .then((res) => (connection = res))
+      .catch((err) => {
+        console.error("Error during Data Source initialization", err);
+      });
+
+    //insert adm
+    const administratorRepo = connection.getRepository(Administrator);
+    let newAdm = Object.assign(new Administrator(), () => {
+      const { password, ...newPayload } = generateAdministrator();
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    });
+    newAdm = await administratorRepo.save(newAdm);
+    tokenAdm = generateToken(newAdm.id as string);
+
+    //insert 2 companies
+    const companyRepo = connection.getRepository(Company);
+    newCompany = Object.assign(new Company(), () => {
+      const { password, ...newPayload } = generateCompany();
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    });
+    newCompany = await administratorRepo.save(newCompany);
+    tokenCompany = generateToken(newCompany.id as string);
+    let newCompanyTwo = Object.assign(new Company(), () => {
+      const { password, ...newPayload } = generateCompany();
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    });
+    newCompanyTwo = await administratorRepo.save(newCompanyTwo);
+    tokenOtherCompany = generateToken(newCompanyTwo.id as string);
+  });
+
+  afterAll(async () => {
+    await connection.destroy();
+  });
+
+  it("Return: Company as JSON response | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get(`/companies/${newCompany.id}`)
+      .set("Authorization", "Bearer " + tokenCompany);
+    const { passwordHash, adverts, comparePwd, ...company } = newCompany;
+    expect(response.status).toBe(200);
+    expect(response.body).not.toHaveProperty("passwordHash");
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        ...company,
+        adverts: `/adverts/byCompany/${company.id}`,
+      })
+    );
+  });
+
+  it("Return: Company as JSON response | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get(`/companies/${newCompany.id}`)
+      .set("Authorization", "Bearer " + tokenAdm);
+    const { passwordHash, adverts, comparePwd, ...company } = newCompany;
+    expect(response.status).toBe(200);
+    expect(response.body).not.toHaveProperty("passwordHash");
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        ...company,
+        adverts: `/adverts/byCompany/${company.id}`,
+      })
+    );
+  });
+
+  it("Return: Body error, missing token | Status code: 400", async () => {
+    const response = await supertest(app).get(`/companies/${newCompany.id}`);
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({
+      Error: "Missing authorization token",
+    });
+  });
+
+  it("Return: Body error, invalid token | Status code: 401", async () => {
+    const token = "invalidToken";
+
+    const response = await supertest(app)
+      .get(`/companies/${newCompany.id}`)
+      .set("Authorization", "Bearer " + token);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
+  });
+
+  it("Return: Body error, no permision | Status code: 403", async () => {
+    const response = await supertest(app)
+      .get(`/companies/${newCompany.id}`)
+      .set("Authorization", "Bearer " + tokenOtherCompany);
+
+    expect(response.status).toBe(403);
+    expect(response.body).toStrictEqual({
+      Error: "You can't access information of another company",
+    });
+  });
+
+  it("Return: Body error, not Found | Status code: 404", async () => {
+    const response = await supertest(app)
+      .get(`/companies/${"idNotExistent"}`)
+      .set("Authorization", "Bearer " + tokenCompany);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toStrictEqual({
+      Message: "Company not found",
     });
   });
 });

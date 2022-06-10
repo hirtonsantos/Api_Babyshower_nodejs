@@ -1,6 +1,7 @@
 import { faker } from "@faker-js/faker";
 import jwt from "jsonwebtoken";
 import { Administrator } from "../entities/administrators.entity";
+import { Advert } from "../entities/adverts.entity";
 import { Company } from "../entities/companies.entity";
 
 export interface ICompany extends Partial<Company> {
@@ -9,6 +10,11 @@ export interface ICompany extends Partial<Company> {
 
 export interface IAdministrator extends Partial<Administrator> {
   password: string;
+}
+
+export interface IAdvert extends Partial<Omit<Advert, "category">> {
+  category: string;
+  image: string;
 }
 
 //Aqui é o payload, como o dado entra no request antes do schema
@@ -23,7 +29,18 @@ const generateCompany = (): Partial<ICompany> => {
 };
 
 //Aqui é o payload, como o dado entra no request antes do schema
-const generateAdvert = () => {};
+const generateAdvert = (): Partial<IAdvert> => {
+  const arr: string[] = ["Premium", "Platinum", "Black"];
+
+  const title = faker.random.words(6);
+  const apliedPrice = parseFloat(faker.commerce.price(100, 500));
+  const description = faker.random.words(10);
+  const linkAdverts = faker.internet.url();
+  const image = faker.internet.url();
+  const category: string = arr[Math.floor(Math.random() * arr.length)];
+
+  return { title, apliedPrice, description, linkAdverts, image, category };
+};
 
 //Aqui é o payload, como o dado entra no request antes do schema
 const generateAdministrator = () => {
