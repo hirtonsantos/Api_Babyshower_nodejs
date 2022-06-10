@@ -4,10 +4,9 @@ import chatArchiveService from "../../services/chat/chatArchive.service"
 const chatArchiveController = async (req: Request, res: Response) => {
     try {
 
-        const other_parent_id = "other_parent_id"
-        const user_id = "user_id"
+        const chat_id = req.params[0]
 
-        const data = await chatArchiveService(user_id, other_parent_id)
+        const data = await chatArchiveService(chat_id)
 
         return res.json(data)
         

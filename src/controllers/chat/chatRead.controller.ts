@@ -4,10 +4,11 @@ import chatReadService from "../../services/chat/chatRead.service"
 const chatReadController = async (req: Request, res: Response) => {
     try {
 
-        const other_parent_id = "user_id"
-        const user_id = "other_parent_id"
+        const chat_id = req.params.id
+        console.log(chat_id)
+        const user_id = 2
 
-        const data = await chatReadService(user_id, other_parent_id)
+        const data = await chatReadService(chat_id, user_id)
 
         return res.json(data)
         

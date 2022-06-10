@@ -4,7 +4,7 @@ import chatListService from "../../services/chat/chatList.service"
 const chatListController = async (req: Request, res: Response) => {
     try {
 
-        const user_id = "other_parent_id"
+        const user_id = 2
 
         const data = await chatListService(user_id)
 

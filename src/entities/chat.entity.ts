@@ -8,20 +8,14 @@ export class Chat {
     @PrimaryColumn("uuid")
     readonly id: string
 
-    @Column()
-    created_at: string
-
-    @Column()
-    updated_at: string
-
     @Column("boolean", {default:false})
     archived: boolean
 
     @Column()
-    parent_user: string
+    parent_user: number
 
     @Column()
-    other_parent_user: string
+    other_parent_user: number
 
     @OneToMany(() => Message, (message) => message.chat, {
         eager: true

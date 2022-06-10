@@ -1,23 +1,28 @@
 import { AppDataSource } from "../../data-source";
 import { Chat } from "../../entities/chat.entity";
+import { Message } from "../../entities/messages.entity";
 
-const chatReadService = async (id: string, other_parent_id: string) => {
+const chatReadService = async (chat_id: string, user_id: number) => {
   const chatRepository = AppDataSource.getRepository(Chat);
+  const msgRepository = AppDataSource.getRepository(Message);
 
   const chat = await chatRepository.findOneBy({
-    parent_user: id,
-    other_parent_user: other_parent_id,
+    id: chat_id,
   })
 
-  chat?.messages.filter(msg => {
-    if(msg.parent_id === other_parent_id){
-      msg.read_message = true
+  chat?.messages.map(async (msg) => {
+    if (msg.parent_id !== 1) {
+      const msg_item = await msgRepository.findOneBy({
+        id: msg.id,
+      })
+      msgRepository.update(msg_item!.id, {read_message: true});
     }
-  })
+    return true
+  });
 
-  chatRepository.save(chat!)
-
-  return chat;
+  return {
+    messages: chat?.messages
+  }
 };
 
 export default chatReadService;

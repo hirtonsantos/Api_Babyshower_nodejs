@@ -15,9 +15,12 @@ export class Message {
     read_message: boolean
 
     @Column()
-    parent_id: string
+    createdAt: string
 
-    @ManyToOne(() => Chat, (chat) => chat)
+    @Column()
+    parent_id: number
+
+    @ManyToOne(() => Chat, (chat) => chat.id)
     chat: Chat
 
     constructor() {

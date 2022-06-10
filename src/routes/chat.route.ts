@@ -7,10 +7,10 @@ import createMessageController from "../controllers/chat/messageCreate.controlle
 const routes = Router();
 
 export const chatRoutes = () => {
-  routes.post("/", createMessageController);
-  routes.get("/", chatReadController);
-  routes.get("/list", chatListController)
-  routes.put("/archive", chatArchiveController)
+  routes.get("/", chatListController)
+  routes.post("/:id", createMessageController);
+  routes.get("/:id", chatReadController);
+  routes.put("/:id", chatArchiveController)
 
   return routes;
 };

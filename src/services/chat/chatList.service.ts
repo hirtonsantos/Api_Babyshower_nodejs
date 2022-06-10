@@ -1,7 +1,7 @@
 import { AppDataSource } from "../../data-source";
 import { Chat } from "../../entities/chat.entity";
 
-const chatListService = async (user_id: string) => {
+const chatListService = async (user_id: number) => {
   const chatRepository = AppDataSource.getRepository(Chat);
 
   const chat = await chatRepository.find({
@@ -14,7 +14,10 @@ const chatListService = async (user_id: string) => {
     return { error: "Sem chat disponível, inicie uma conversa" };
   }
 
-  return chat;
+  return {
+    chats: chat
+  }
+  
 };
 
 export default chatListService;

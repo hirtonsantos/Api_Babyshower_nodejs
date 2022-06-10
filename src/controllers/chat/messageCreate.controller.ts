@@ -4,9 +4,9 @@ import createMessageService from "../../services/chat/createMessage.service"
 const createMessageController = async (req: Request, res: Response) => {
     try {
 
-        const other_parent_id: string = "other_parent_id"
+        const other_parent_id = Number(req.params.id)
         const data = req.body
-        const user_id = "user_id"
+        const user_id = 2
 
         const messageData = await createMessageService(data, other_parent_id, user_id)
 
