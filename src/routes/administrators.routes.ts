@@ -1,4 +1,7 @@
 import { Router } from "express";
+
+import validateSchema from "../middlewares/validateSchema.middleware";
+
 import administratorDeleteService from "../controllers/administrators/administratorsDeleteSelf.controller";
 import administratorsListController from "../controllers/administrators/administratorsList.controller";
 import administratorLoginController from "../controllers/administrators/administratorsLogin.controller";
@@ -12,7 +15,7 @@ export const administratorRoutes = () => {
   routes.post("/", adminstradorRegisterController);
   routes.get("/", administratorsListController);
   routes.get("/:id", administratorUserController);
-  routes.post("/login", administratorLoginController);
+  routes.post("/login", validateSchema, administratorLoginController);
   routes.patch("/:id", administratorUpdateController);
   routes.delete("/:id", administratorDeleteService);
 

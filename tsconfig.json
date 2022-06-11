@@ -14,10 +14,10 @@
     "strict": true,
     "strictPropertyInitialization": false,
     "skipLibCheck": true,
-    "useUnknownInCatchVariables": false,
+    "useUnknownInCatchVariables": false
     // "rootDir": "./src",
 
     // ! Para executar o app, esse campo deve ser descomentado.
-    "typeRoots": ["./@types"]
+    // "typeRoots": ["./@types"]
   }
 }

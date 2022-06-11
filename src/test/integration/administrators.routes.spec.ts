@@ -8,6 +8,7 @@ import { AppDataSource } from "../../data-source";
 import { hashSync } from "bcrypt";
 import { verify } from "jsonwebtoken";
 
+/*
 describe("Create administrator route | Integration Test", () => {
   let connection: DataSource;
 
@@ -138,6 +139,7 @@ describe("Create administrator route | Integration Test", () => {
     });
   });
 });
+*/
 
 describe("Login administrator route | Integration Test", () => {
   let connection: DataSource;
@@ -225,6 +227,8 @@ describe("Login administrator route | Integration Test", () => {
     const response = await supertest(app)
       .post("/administrators/login")
       .send({ password });
+
+    console.error(response.body);
 
     expect(response.status).toBe(400);
   });

@@ -1,5 +1,5 @@
 import { Express } from "express";
-import { administratorRoutes } from "./administrators.route";
+import { administratorRoutes } from "./administrators.routes";
 import { advertsRoutes } from "./adverts.routes";
 import { companiesRoutes } from "./companies.routes";
 

@@ -5,8 +5,7 @@ import { ICompanyLogin } from "../../src/interfaces/companies/index";
 declare global {
   namespace Express {
     interface Request {
-      validated: Company & Administrator;
-      validated: Company | ICompanyLogin;
+      validated: Company | (ICompanyLogin & Administrator);
     }
   }
 }
