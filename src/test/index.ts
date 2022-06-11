@@ -17,7 +17,7 @@ export interface IAdvert extends Partial<Omit<Advert, "category">> {
 }
 
 //Aqui é o payload, como o dado entra no request antes do schema
-const generateCompany = (): Partial<ICompany> => {
+const generateCompany = () => {
   const razaoSocial = faker.company.companyName().toUpperCase();
   const username = faker.internet.userName(razaoSocial).toLowerCase();
   const email = faker.internet.email(razaoSocial).toLocaleLowerCase();
@@ -28,7 +28,7 @@ const generateCompany = (): Partial<ICompany> => {
 };
 
 //Aqui é o payload, como o dado entra no request antes do schema
-const generateAdvert = (): Partial<IAdvert> => {
+const generateAdvert = () => {
   const arr: string[] = ["Premium", "Platinum", "Black"];
 
   const title = faker.random.words(6);

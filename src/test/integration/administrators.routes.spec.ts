@@ -8,7 +8,7 @@ import { AppDataSource } from "../../data-source";
 import { hashSync } from "bcrypt";
 import { verify } from "jsonwebtoken";
 
-describe("Create administrator route | Integration Test", () => {
+/* describe("Create administrator route | Integration Test", () => {
   let connection: DataSource;
 
   const firstAdministrator: Partial<IAdministrator> = generateAdministrator();
@@ -229,3 +229,4 @@ describe("Login administrator route | Integration Test", () => {
     expect(response.status).toBe(400);
   });
 });
+ */
