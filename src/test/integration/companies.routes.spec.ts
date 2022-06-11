@@ -297,7 +297,7 @@ describe("Login company route | Integration Test", () => {
 
     //add admnistrator
     const admRepo = connection.getRepository(Administrator);
-    let adm = Object.assign(
+    let adm: Administrator = Object.assign(
       new Administrator(),
       newInstance(generateAdministrator())
     );
@@ -315,7 +315,7 @@ describe("Login company route | Integration Test", () => {
       new Company(),
       newInstance(generateCompany())
     );
-    newOtherCompany = await companyRepo.save(newCompany);
+    newOtherCompany = await companyRepo.save(newOtherCompany);
     tokenOtherCompany = generateToken(newCompany.id as string);
   });
 

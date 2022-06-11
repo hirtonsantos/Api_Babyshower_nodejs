@@ -137,9 +137,9 @@ import { verify } from "jsonwebtoken";
       error: "Key email or username already exists",
     });
   });
-});
+}); */
 
-describe("Login administrator route | Integration Test", () => {
+/* describe("Login administrator route | Integration Test", () => {
   let connection: DataSource;
 
   let payload = generateAdministrator();
@@ -228,5 +228,4 @@ describe("Login administrator route | Integration Test", () => {
 
     expect(response.status).toBe(400);
   });
-});
- */
+}); */

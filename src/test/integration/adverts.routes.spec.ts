@@ -3,7 +3,9 @@ import {
   generateAdvert,
   generateCompany,
   generateToken,
+  IAdministrator,
   IAdvert,
+  ICompany,
 } from "..";
 import { Advert } from "../../entities/adverts.entity";
 import supertest from "supertest";
@@ -32,38 +34,31 @@ import { CategoryAdvert } from "../../entities/categoryAdverts.entity";
         console.error("Error during Data Source initialization", err);
       });
 
-    //add admnistrator
-    const admRepo = connection.getRepository(Administrator);
-    adm = Object.assign(new Administrator(), () => {
-      const { password, ...newPayload } = generateAdministrator();
+    const newInstance = (generate: ICompany | IAdministrator): any => {
+      const { password, ...newPayload } = generate;
       return {
         ...newPayload,
         passwordHash: "passwordHash",
       };
-    });
+    };
+
+    //add admnistrator
+    const admRepo = connection.getRepository(Administrator);
+    adm = Object.assign(
+      new Administrator(),
+      newInstance(generateAdministrator())
+    );
     adm = await admRepo.save(adm);
     tokenAdm = generateToken(adm.id as string);
 
     //add company
     const companyRepo = connection.getRepository(Company);
-    company = Object.assign(new Company(), () => {
-      const { password, ...newPayload } = generateCompany();
-      return {
-        ...newPayload,
-        passwordHash: "passwordHash",
-      };
-    });
+    company = Object.assign(new Company(), newInstance(generateCompany()));
     company = await companyRepo.save(company);
     tokenCompany = generateToken(company.id as string);
 
     //add other company
-    otherCompany = Object.assign(new Company(), () => {
-      const { password, ...newPayload } = generateCompany();
-      return {
-        ...newPayload,
-        passwordHash: "passwordHash",
-      };
-    });
+    otherCompany = Object.assign(new Company(), newInstance(generateCompany()));
     otherCompany = await companyRepo.save(otherCompany);
   });
 
@@ -173,12 +168,13 @@ import { CategoryAdvert } from "../../entities/categoryAdverts.entity";
       Message: "Company not found",
     });
   });
-});
+}); */
 
-describe("Get adverts | Integration Test", () => {
+//Get adverts ainda está em construção
+/* describe("Get adverts | Integration Test", () => {
   let connection: DataSource;
 
-  let adverts: Advert[];
+  let adverts: Advert[] = [];
 
   beforeAll(async () => {
     await AppDataSource.initialize()
@@ -187,32 +183,35 @@ describe("Get adverts | Integration Test", () => {
         console.error("Error during Data Source initialization", err);
       });
 
+    const newInstance = (generate: ICompany | IAdministrator): any => {
+      const { password, ...newPayload } = generate;
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    };
+
     //insert 10 companies with 1 advert
     const companyRepo = connection.getRepository(Company);
     const advertRepo = connection.getRepository(Advert);
     const categoryRepo = connection.getRepository(CategoryAdvert);
     for (let i = 1; i <= 10; i++) {
-      const company = await companyRepo.save(
-        Object.assign(new Company(), () => {
-          const { password, ...newPayload } = generateCompany();
-          return {
-            ...newPayload,
-            passwordHash: "passwordHash",
-          };
-        })
+      let company: Company = Object.assign(
+        new Company(),
+        newInstance(generateCompany())
       );
+      company = await companyRepo.save(company);
+
+      let payloadAdvert = generateAdvert();
+      const category = await categoryRepo.findOneBy({
+        title: i <= 5 ? "Premium" : "Black",
+      });
 
       const advert = await advertRepo.save(
-        Object.assign(new Advert(), async () => {
-          const advert = generateAdvert();
-          const category = await categoryRepo.findOneBy({
-            title: i <= 5 ? "Premium" : "Black",
-          });
-          return {
-            ...advert,
-            company: company,
-            category: category,
-          };
+        Object.assign(new Advert(), {
+          ...payloadAdvert,
+          company: company,
+          category: category,
         })
       );
       adverts.push(advert);
@@ -223,17 +222,15 @@ describe("Get adverts | Integration Test", () => {
     await connection.destroy();
   });
 
-  it("Return: Companies as JSON response | Status code: 200", async () => {
-    console.log(adverts);
-
-    const response = await supertest(app).get("/companies");
+  it("Return: Adverts as JSON response | Status code: 200", async () => {
+    const response = await supertest(app).get("/adverts");
 
     expect(response.status).toBe(200);
     expect(response.body).toBeInstanceOf(Array);
     expect(response.body).toHaveLength(8);
   });
 
-  /* it("Return: Companies as JSON response page 2 | Status code: 200", async () => {
+  it("Return: Companies as JSON response page 2 | Status code: 200", async () => {
     const response = await supertest(app)
       .get("/companies?page=2")
       .set("Authorization", "Bearer " + tokenAdm);
@@ -241,9 +238,9 @@ describe("Get adverts | Integration Test", () => {
     expect(response.status).toBe(200);
     expect(response.body).toBeInstanceOf(Array);
     expect(response.body).toHaveLength(2);
-  }); */
+  });
 
-/* it("Return: Companies as JSON response perPage 4 | Status code: 200", async () => {
+  it("Return: Companies as JSON response perPage 4 | Status code: 200", async () => {
     const response = await supertest(app)
       .get("/companies?page=2")
       .set("Authorization", "Bearer " + tokenAdm);
@@ -293,6 +290,5 @@ describe("Get adverts | Integration Test", () => {
     expect(response.body).toStrictEqual({
       Error: "You are not allowed to access this information",
     });
-  }); */
-/*});
- */
+  });
+}); */
