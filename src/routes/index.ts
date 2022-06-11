@@ -1,7 +1,7 @@
 import { Express } from 'express'
 import {administratorRoutes} from "./administrators.route"
 import {advertsRoutes} from "./adverts.routes"
-import {companiesRoutes} from "./companies.route"
+import {companiesRoutes} from "./companies.routes"
 import { chatRoutes } from "./chat.route"
 
 export const appRoutes = (app: Express) => {
