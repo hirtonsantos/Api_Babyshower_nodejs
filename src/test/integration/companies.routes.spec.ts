@@ -221,7 +221,7 @@ describe("Login company route | Integration Test", () => {
 
   it("Return: Companies as JSON response perPage 4 | Status code: 200", async () => {
     const response = await supertest(app)
-      .get("/companies?page=2")
+      .get("/companies?perPage=4")
       .set("Authorization", "Bearer " + tokenAdm);
     const { passwordHash, adverts, comparePwd, ...company } = newCompany;
     expect(response.status).toBe(200);
@@ -231,7 +231,7 @@ describe("Login company route | Integration Test", () => {
 
   it("Return: Companies as JSON response page 2 perPage 4 | Status code: 200", async () => {
     const response = await supertest(app)
-      .get("/companies?page=2")
+      .get("/companies?page=2&perPage=4")
       .set("Authorization", "Bearer " + tokenAdm);
     const { passwordHash, adverts, comparePwd, ...company } = newCompany;
     expect(response.status).toBe(200);
