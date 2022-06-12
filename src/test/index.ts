@@ -53,7 +53,12 @@ const generateMessage = () => {
   return { message };
 };
 
-const createMessageInData = () => {};
+const createMessageForData = (parentId: number) => {
+  const parent_id = parentId;
+  const createdAt = new Date();
+
+  return { ...generateMessage, parentId, createdAt };
+};
 
 const generateToken = (id: string | number): string => {
   const token = jwt.sign({ id: id }, process.env.SECRET_KEY as string, {
@@ -69,4 +74,5 @@ export {
   generateAdministrator,
   generateToken,
   generateMessage,
+  createMessageForData,
 };

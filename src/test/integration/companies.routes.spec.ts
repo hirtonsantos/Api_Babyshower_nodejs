@@ -229,14 +229,14 @@ describe("Login company route | Integration Test", () => {
     expect(response.body).toHaveLength(4);
   });
 
-  it("Return: Companies as JSON response page 2 perPage 4 | Status code: 200", async () => {
+  it("Return: Companies as JSON response page 3 perPage 4 | Status code: 200", async () => {
     const response = await supertest(app)
       .get("/companies?page=2&perPage=4")
       .set("Authorization", "Bearer " + tokenAdm);
     const { passwordHash, adverts, comparePwd, ...company } = newCompany;
     expect(response.status).toBe(200);
     expect(response.body).toBeInstanceOf(Array);
-    expect(response.body).toHaveLength(5);
+    expect(response.body).toHaveLength(2);
   });
 
   it("Return: Body error, missing token | Status code: 400", async () => {
