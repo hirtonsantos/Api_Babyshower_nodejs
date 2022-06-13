@@ -11,9 +11,9 @@ const verifyIfAdm = async (
     const userRepository = AppDataSource.getRepository(Administrator) 
 
     const adms = await userRepository.find()
-    console.log(req.decoded.id)
+    console.log("id=", req.decoded.id)
 
-    const accountLogged = adms.find(adm => adm.email === req.decoded.id)
+    const accountLogged = adms.find(adm => adm.id === req.decoded.id)
 
     if (!accountLogged){
         throw new AppError(401, {Error: "You are not allowed to access this information"})
