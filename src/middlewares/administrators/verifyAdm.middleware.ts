@@ -11,6 +11,7 @@ const verifyIfAdm = async (
     const userRepository = AppDataSource.getRepository(Administrator) 
 
     const adms = await userRepository.find()
+    console.log(req.decoded.id)
 
     const accountLogged = adms.find(adm => adm.email === req.decoded.id)
 
