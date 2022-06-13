@@ -1,6 +1,8 @@
 import "reflect-metadata";
 import path from "path";
 import { DataSource } from "typeorm";
+import "reflect-metadata"
+
 import * as dotenv from "dotenv";
 
 dotenv.config();
