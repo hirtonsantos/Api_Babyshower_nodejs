@@ -6,9 +6,9 @@ import administratorRegisterController from "../controllers/administrators/admin
 import administratorUpdateController from "../controllers/administrators/administratorUpdate.controller";
 import administratorUserController from "../controllers/administrators/administratorUser.controller";
 import validateAdmToken from "../middlewares/administrators/authAdm.middelware";
+
 import verifyUniqueValuesAdmin from "../middlewares/administrators/verifyAdmUniqueValues.middleware";
 import verifyIfAdm from "../middlewares/administrators/verifyIfAdm.middleware";
-
 import validateSchema from "../middlewares/validateSchema.middleware";
 import { registerAdminSchema } from "../schemas/administrators/renameAdmin.schema";
 
