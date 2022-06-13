@@ -5,6 +5,7 @@ declare global {
   namespace Express {
     interface Request {
       validated: Company | ICompanyLogin;
+      decoded: Administrator;
       userId: string;
     }
   }
