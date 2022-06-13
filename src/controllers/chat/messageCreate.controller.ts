@@ -1,6 +1,6 @@
 import { Response, Request } from "express"
 import { AppError, handleError } from "../../errors/appError"
-import createMessageService from "../../services/chat/createMessage.service"
+import createMessageService from "../../services/chat/messageCreate.service"
 
 const createMessageController = async (req: Request, res: Response) => {
     try {

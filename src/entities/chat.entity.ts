@@ -28,5 +28,4 @@ export class Chat {
             this.id = uuid()
         }
     }
-
 }
