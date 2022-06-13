@@ -4,10 +4,10 @@ import { AppError, handleError } from "../errors/appError";
 
 const authUser = (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = req.headers.authorization
+    const token = req.headers.authorization;
 
     if (!token) {
-      throw new AppError(401, "missing authorization token");
+      throw new AppError(401, { Error: "missing authorization token" });
     }
 
     jwt.verify(
@@ -31,6 +31,6 @@ const authUser = (req: Request, res: Response, next: NextFunction) => {
       handleError(err, res);
     }
   }
-}
+};
 
-export default authUser
+export default authUser;
