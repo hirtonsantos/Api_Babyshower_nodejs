@@ -318,7 +318,7 @@ describe("Login company route | Integration Test", () => {
       newInstance(generateCompany())
     );
     newOtherCompany = await companyRepo.save(newOtherCompany);
-    tokenOtherCompany = generateToken(newCompany.id as string);
+    tokenOtherCompany = generateToken(newOtherCompany.id as string);
   });
 
   afterAll(async () => {

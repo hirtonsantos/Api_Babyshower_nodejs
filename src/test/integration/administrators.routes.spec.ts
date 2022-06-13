@@ -8,7 +8,8 @@ import { AppDataSource } from "../../data-source";
 import { hashSync } from "bcrypt";
 import { verify } from "jsonwebtoken";
 
-/* describe("Create administrator route | Integration Test", () => {
+/*
+  describe("Create administrator route | Integration Test", () => {
   let connection: DataSource;
 
   const firstAdministrator: Partial<IAdministrator> = generateAdministrator();
@@ -55,22 +56,6 @@ import { verify } from "jsonwebtoken";
     );
   });
 
-  it("Return: Administrator as JSON response | Status code 201", async () => {
-    const { password, ...newAdministrator } = administrator;
-
-    const response = await supertest(app)
-      .post("/administrators")
-      .set("Authorization", "Bearer " + tokenFirstAdministrator)
-      .send({ ...administrator });
-
-    expect(response.status).toBe(201);
-    expect(response.body).toHaveProperty(["id"]);
-    expect(validate(response.body.id)).toBeTruthy();
-    expect(response.body).toEqual(
-      expect.objectContaining({ ...newAdministrator })
-    );
-  });
-
   it("Return: Body error, missing token | Status code: 400", async () => {
     const response = await supertest(app)
       .post("/administrators")
@@ -87,6 +72,7 @@ import { verify } from "jsonwebtoken";
 
     const response = await supertest(app)
       .post("/administrators")
+      .set("Authorization", "Bearer " + tokenFirstAdministrator)
       .send({ ...newAdministrator });
 
     expect(response.status).toBe(400);
@@ -99,7 +85,7 @@ import { verify } from "jsonwebtoken";
     const token = "invalidToken";
 
     const response = await supertest(app)
-      .get("/administrators")
+      .post("/administrators")
       .set("Authorization", "Bearer " + token)
       .send({ ...administrator });
 
@@ -113,7 +99,7 @@ import { verify } from "jsonwebtoken";
     const token = generateToken(uuid());
 
     const response = await supertest(app)
-      .get("/administrators")
+      .post("/administrators")
       .set("Authorization", "Bearer " + token)
       .send({ ...administrator });
 
@@ -140,6 +126,7 @@ import { verify } from "jsonwebtoken";
 });
 */
 
+/*
 describe("Login administrator route | Integration Test", () => {
   let connection: DataSource;
 
@@ -230,3 +217,4 @@ describe("Login administrator route | Integration Test", () => {
     expect(response.status).toBe(400);
   });
 });
+*/
