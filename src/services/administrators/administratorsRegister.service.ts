@@ -4,7 +4,7 @@ import { Administrator } from "../../entities/administrators.entity"
 import { IAdministratorRegister } from "../../interfaces/administrators"
 import { serializedCreateUserSchema } from "../../schemas/administrator/renameAdmin.schema"
 
-const adminstradorRegisterService = async ({username, email, password}: IAdministratorRegister) => {
+const administratorRegisterService = async ({username, email, password}: IAdministratorRegister) => {
     
     const adminRepository = AppDataSource.getRepository(Administrator)
 
@@ -20,4 +20,4 @@ const adminstradorRegisterService = async ({username, email, password}: IAdminis
     });
 }
 
-export default adminstradorRegisterService
+export default administratorRegisterService
