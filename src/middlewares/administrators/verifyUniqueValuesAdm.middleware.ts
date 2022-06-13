@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { AppDataSource } from "../../data-source";
 
 import { Administrator } from "../../entities/administrators.entity";
+import { IAdministratorRegister } from "../../interfaces/administrators";
 
 const verifyUniqueValuesAdmin = async (
   req: Request,
@@ -10,8 +11,10 @@ const verifyUniqueValuesAdmin = async (
 ) => {
   const admRepository = AppDataSource.getRepository(Administrator);
 
+  const {username, email} = req.validated as IAdministratorRegister
+
   const usernameExists = await admRepository.findOne({
-    where: { username: req.validated.username },
+    where: { username: username },
   });
 
   if (usernameExists) {
@@ -21,7 +24,7 @@ const verifyUniqueValuesAdmin = async (
   }
 
   const emailExists = await admRepository.findOne({
-    where: { email: req.validated.email },
+    where: { email: email },
   });
 
   if (emailExists) {
