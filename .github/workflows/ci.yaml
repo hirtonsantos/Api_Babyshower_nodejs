@@ -23,7 +23,7 @@ jobs:
         run: yarn
 
       - name: Build
-        run: yarn run build --if-present
+        run: yarn run build
 
       - name: Test
         run: yarn test --coverage
