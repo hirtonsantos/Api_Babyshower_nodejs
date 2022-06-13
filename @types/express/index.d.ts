@@ -7,6 +7,7 @@ declare global {
     interface Request {
       validated: Company | ICompanyLogin;
       validatedAdmin: Administrator;
+      userId: string;
     }
   }
 }
