@@ -282,6 +282,10 @@ import { Message } from "../../entities/messages.entity";
     chatWithoutParent = await chatRepo.save(chatWithoutParent);
   });
 
+  afterAll(async () => {
+    await connection.destroy();
+  });
+
   it("Return: Chats as JSON response | Status code 200", async () => {
     const response = await supertest(app)
       .get(`/chat`)
@@ -350,4 +354,124 @@ import { Message } from "../../entities/messages.entity";
   });
 }); */
 
-/* describe("Update chat to archieved", () => {}); */
+/* describe("Update chat to archieved", () => {
+  let connection: DataSource;
+
+  let chatWithParent: Chat;
+  let chatWithoutParent: Chat;
+  let token: string = generateToken(1);
+
+  beforeAll(async () => {
+    await AppDataSource.initialize()
+      .then((res) => (connection = res))
+      .catch((err) => {
+        console.error("Error during Data Source initialization", err);
+      });
+
+    //cria um chat que o usuário participa com uma mensagem
+    const chatRepo = connection.getRepository(Chat);
+    const messageRepo = connection.getRepository(Message);
+
+    let messageParent = Object.assign(new Message(), {
+      ...createMessageForData(1),
+    });
+    await messageRepo.save(messageParent);
+    let chatWithParent = Object.assign(new Chat(), {
+      parent_user: 1,
+      other_parent_user: 2,
+      messages: [],
+    });
+    chatWithParent.messages.push(messageParent);
+    chatWithParent = await chatRepo.save(chatWithParent);
+
+    //cria um chat em que ele não participa com uma mensagem
+    chatWithoutParent = Object.assign(new Chat(), {
+      parent_user: 3,
+      other_parent_user: 2,
+      messages: [],
+    });
+    let message: Message;
+    message = Object.assign(new Message(), {
+      ...createMessageForData(1),
+    });
+    await messageRepo.save(message);
+    chatWithoutParent = await chatRepo.save(chatWithoutParent);
+  });
+
+  afterAll(async () => {
+    await connection.destroy();
+  });
+
+  it("Return: No body response | Status code: 204", async () => {
+    const response = await supertest(app)
+      .patch(`/chat/${chatWithParent.id}`)
+      .set("Authorization", "Bearer " + token)
+      .send({ archieved: true });
+
+    const chatRepo = connection.getRepository(Chat);
+    const updatedChat = await chatRepo.findOneBy({ id: chatWithParent.id });
+
+    expect(response.status).toBe(204);
+    expect(updatedChat).toEqual(expect.objectContaining({ archieved: true }));
+  });
+
+  it("Return: Body error, missing token | Status code: 400", async () => {
+    const response = await supertest(app)
+      .patch(`/chat/${chatWithParent.id}`)
+      .send({ archieved: true });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({
+      Error: "Missing authorization token.",
+    });
+  });
+
+  it("Return: Body error, invalid information | Status code: 400", async () => {
+    const newInformation = { title: 126 };
+
+    const response = await supertest(app)
+      .patch(`/chat/${chatWithParent.id}`)
+      .set("Authorization", "Bearer " + token)
+      .send({ archieved: true });
+
+    expect(response.status).toBe(400);
+  });
+
+  it("Return: Body error, invalid token | Status code: 401", async () => {
+    const token = "invalidToken";
+
+    const response = await supertest(app)
+      .patch(`/chat/${chatWithParent.id}`)
+      .set("Authorization", "Bearer " + token)
+      .send({ archieved: true });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
+  });
+
+  it("Return: Body error, no permision | Status code: 403", async () => {
+    const response = await supertest(app)
+      .patch(`/chat/${chatWithoutParent.id}`)
+      .set("Authorization", "Bearer " + token)
+      .send({ archieved: true });
+
+    expect(response.status).toBe(403);
+    expect(response.body).toStrictEqual({
+      Error: "You can't access information of another user",
+    });
+  });
+
+  it("Return: Body error, chat not Found | Status code: 404", async () => {
+    const response = await supertest(app)
+      .patch(`/chat/${"idNotExist"}`)
+      .set("Authorization", "Bearer " + token)
+      .send({ archieved: true });
+
+    expect(response.status).toBe(404);
+    expect(response.body).toStrictEqual({
+      Message: "Chat not found",
+    });
+  });
+}); */
