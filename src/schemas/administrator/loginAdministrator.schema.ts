@@ -5,7 +5,7 @@ const loginAdminstratorSchema = yup.object().shape(
     username: yup
       .string()
       .transform((value) => value.toLowerCase())
-      .when(["email"], {
+      .when("email", {
         is: (email: string) => !email,
         then: yup.string().required(),
       }),
@@ -13,7 +13,7 @@ const loginAdminstratorSchema = yup.object().shape(
       .string()
       .email()
       .transform((value) => value.toLowerCase())
-      .when(["username"], {
+      .when("username", {
         is: (username: string) => !username,
         then: yup.string().required(),
       }),
@@ -26,5 +26,3 @@ const loginAdminstratorSchema = yup.object().shape(
 );
 
 export default loginAdminstratorSchema;
-
-

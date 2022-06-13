@@ -15,6 +15,7 @@ import { hashSync } from "bcrypt";
 import { verify } from "jsonwebtoken";
 import { Administrator } from "../../entities/administrators.entity";
 
+/*
 describe("Create company route | Integration Test", () => {
   let connection: DataSource;
 
@@ -138,6 +139,7 @@ describe("Login company route | Integration Test", () => {
     expect(response.status).toBe(400);
   });
 });
+*/
 
 /* describe("Get companies route | Integration Test", () => {
   let connection: DataSource;

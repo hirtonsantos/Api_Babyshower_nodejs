@@ -1,9 +1,6 @@
 const adminstradorRegisterController = () => {
-    try {
-        
-    } catch (error) {
-        
-    }
-}
+  try {
+  } catch (error) {}
+};
 
-export default adminstradorRegisterController
+export default adminstradorRegisterController;
