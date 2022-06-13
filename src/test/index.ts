@@ -42,9 +42,9 @@ const generateAdvert = () => {
 const generateAdministrator = () => {
   const username = faker.internet.userName().toLowerCase();
   const email = faker.internet.email(username).toLocaleLowerCase();
-  const password = faker.random.numeric(8);
+  const passwordHash = faker.random.numeric(8);
 
-  return { username, email, password };
+  return { username, email, passwordHash };
 };
 
 const generateMessage = () => {

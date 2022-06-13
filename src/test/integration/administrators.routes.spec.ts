@@ -154,11 +154,11 @@ describe("Login administrator route | Integration Test", () => {
       });
 
     const administratorRepo = connection.getRepository(Administrator);
-    const { password, ...newPayload } = payload;
+    const { passwordHash, ...newPayload } = payload;
 
     administrator = Object.assign(new Administrator(), {
       ...newPayload,
-      passwordHash: hashSync(password as string, 8),
+      passwordHash: hashSync(passwordHash as string, 8),
     });
     administrator = await administratorRepo.save(administrator);
   });
@@ -168,11 +168,11 @@ describe("Login administrator route | Integration Test", () => {
   });
 
   it("Return: token as JSON response | Status code: 200", async () => {
-    const { email, password } = payload;
+    const { email, passwordHash } = payload;
 
     const response = await supertest(app)
       .post("/administrators/login")
-      .send({ email, password });
+      .send({ email, passwordHash });
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("id");
@@ -183,11 +183,11 @@ describe("Login administrator route | Integration Test", () => {
   });
 
   it("Return: token as JSON response | Status code: 200", async () => {
-    const { username, password } = payload;
+    const { username, passwordHash } = payload;
 
     const response = await supertest(app)
       .post("/administrators/login")
-      .send({ username, password });
+      .send({ username, passwordHash });
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("id");
@@ -202,7 +202,7 @@ describe("Login administrator route | Integration Test", () => {
 
     const response = await supertest(app)
       .post("/administrators/login")
-      .send({ email, password: "wrongPassword" });
+      .send({ email, passwordHash: "wrongPassword" });
 
     expect(response.status).toBe(401);
     expect(response.body).toStrictEqual({
@@ -221,11 +221,11 @@ describe("Login administrator route | Integration Test", () => {
   });
 
   it("Return: Body error, incomplet keys | Status code: 400", async () => {
-    const { password } = payload;
+    const { passwordHash } = payload;
 
     const response = await supertest(app)
       .post("/administrators/login")
-      .send({ password });
+      .send({ passwordHash });
 
     expect(response.status).toBe(400);
   });

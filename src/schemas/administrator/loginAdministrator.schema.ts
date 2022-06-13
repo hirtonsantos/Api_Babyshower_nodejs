@@ -17,7 +17,7 @@ const loginAdminstratorSchema = yup.object().shape(
         is: (username: string) => !username,
         then: yup.string().required(),
       }),
-    password: yup.string().required(),
+    passwordHash: yup.string().required(),
   },
   [
     ["username", "email"],

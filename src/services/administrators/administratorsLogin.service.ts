@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 import { AppError } from "../../errors/appError";
 
 import * as dotenv from "dotenv";
-import { compare } from "bcrypt";
 
 dotenv.config();
 
@@ -20,19 +19,12 @@ const administratorLoginService = async ({ validatedAdmin }: Request) => {
       adm.email === validatedAdmin.email
   );
 
-  if (!administrator) {
+  if (
+    !administrator ||
+    !(await administrator.comparePwd(validatedAdmin.passwordHash))
+  ) {
     throw new AppError(401, { Error: "User not authorized" });
   }
-
-  compare(
-    validatedAdmin.passwordHash,
-    administrator.passwordHash,
-    (error, result) => {
-      if (error) {
-        console.log("YES");
-      }
-    }
-  );
 
   const token = jwt.sign(
     { id: administrator.id },
