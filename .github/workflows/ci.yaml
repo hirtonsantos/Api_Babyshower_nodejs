@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: teste
+      EXPIRES_IN: 1h
 
     steps:
       - name: Checkout repository
