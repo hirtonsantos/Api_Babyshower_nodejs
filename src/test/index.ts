@@ -16,7 +16,6 @@ export interface IAdvert extends Partial<Omit<Advert, "category">> {
   category: string;
 }
 
-//Aqui é o payload, como o dado entra no request antes do schema
 const generateCompany = () => {
   const razaoSocial = faker.company.companyName().toUpperCase();
   const username = faker.internet.userName(razaoSocial).toLowerCase();
@@ -27,7 +26,6 @@ const generateCompany = () => {
   return { razaoSocial, username, email, password, cnpj };
 };
 
-//Aqui é o payload, como o dado entra no request antes do schema
 const generateAdvert = () => {
   const arr: string[] = ["Premium", "Platinum", "Black"];
 
@@ -41,7 +39,6 @@ const generateAdvert = () => {
   return { title, apliedPrice, description, linkAdverts, image, category };
 };
 
-//Aqui é o payload, como o dado entra no request antes do schema
 const generateAdministrator = () => {
   const username = faker.internet.userName().toLowerCase();
   const email = faker.internet.email(username).toLocaleLowerCase();
@@ -50,10 +47,20 @@ const generateAdministrator = () => {
   return { username, email, password };
 };
 
-//Aqui é o payload, como o dado entra no request antes do schema
-const generateMessage = () => {};
+const generateMessage = () => {
+  const message = faker.lorem.sentence();
 
-const generateToken = (id: string): string => {
+  return { message };
+};
+
+const createMessageForData = (parentId: number) => {
+  const parent_id = parentId;
+  const createdAt = new Date();
+
+  return { ...generateMessage, parentId, createdAt };
+};
+
+const generateToken = (id: string | number): string => {
   const token = jwt.sign({ id: id }, process.env.SECRET_KEY as string, {
     expiresIn: process.env.EXPIRES_IN,
   });
@@ -67,4 +74,5 @@ export {
   generateAdministrator,
   generateToken,
   generateMessage,
+  createMessageForData,
 };

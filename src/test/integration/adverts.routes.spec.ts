@@ -170,7 +170,6 @@ import { CategoryAdvert } from "../../entities/categoryAdverts.entity";
   });
 }); */
 
-//Get adverts ainda está em construção
 /* describe("Get adverts | Integration Test", () => {
   let connection: DataSource;
 
@@ -204,7 +203,7 @@ import { CategoryAdvert } from "../../entities/categoryAdverts.entity";
 
       let payloadAdvert = generateAdvert();
       const category = await categoryRepo.findOneBy({
-        title: i <= 5 ? "Premium" : "Black",
+        title: i <= 5 ? "Premium" : i <= 7 ? "Platinum" : "Black",
       });
 
       const advert = await advertRepo.save(
@@ -225,70 +224,65 @@ import { CategoryAdvert } from "../../entities/categoryAdverts.entity";
   it("Return: Adverts as JSON response | Status code: 200", async () => {
     const response = await supertest(app).get("/adverts");
 
+    const { id, linkAdverts, image } = adverts[0];
+
     expect(response.status).toBe(200);
     expect(response.body).toBeInstanceOf(Array);
     expect(response.body).toHaveLength(8);
+    expect(response.body[0]).toEqual(
+      expect.objectContaining({
+        id,
+        linkAdverts,
+        image,
+      })
+    );
   });
 
   it("Return: Companies as JSON response page 2 | Status code: 200", async () => {
-    const response = await supertest(app)
-      .get("/companies?page=2")
-      .set("Authorization", "Bearer " + tokenAdm);
-    const { passwordHash, adverts, comparePwd, ...company } = newCompany;
+    const response = await supertest(app).get("/averts?page=2");
+
     expect(response.status).toBe(200);
     expect(response.body).toBeInstanceOf(Array);
     expect(response.body).toHaveLength(2);
   });
 
   it("Return: Companies as JSON response perPage 4 | Status code: 200", async () => {
-    const response = await supertest(app)
-      .get("/companies?page=2")
-      .set("Authorization", "Bearer " + tokenAdm);
-    const { passwordHash, adverts, comparePwd, ...company } = newCompany;
+    const response = await supertest(app).get("/averts?perPage=4");
+
     expect(response.status).toBe(200);
     expect(response.body).toBeInstanceOf(Array);
     expect(response.body).toHaveLength(4);
   });
 
   it("Return: Companies as JSON response page 2 perPage 4 | Status code: 200", async () => {
-    const response = await supertest(app)
-      .get("/companies?page=2")
-      .set("Authorization", "Bearer " + tokenAdm);
-    const { passwordHash, adverts, comparePwd, ...company } = newCompany;
+    const response = await supertest(app).get("/averts?page=2&perPage=4");
+
     expect(response.status).toBe(200);
     expect(response.body).toBeInstanceOf(Array);
     expect(response.body).toHaveLength(5);
   });
 
-  it("Return: Body error, missing token | Status code: 400", async () => {
-    const response = await supertest(app).get("/companies");
-    expect(response.status).toBe(400);
-    expect(response.body).toStrictEqual({
-      Error: "Missing authorization token",
-    });
+  it("Return: Companies as JSON response category Premium | Status code: 200", async () => {
+    const response = await supertest(app).get("/averts?category=Premium");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(5);
   });
 
-  it("Return: Body error, invalid token | Status code: 401", async () => {
-    const token = "invalidToken";
+  it("Return: Companies as JSON response category platinum | Status code: 200", async () => {
+    const response = await supertest(app).get("/averts?category=platinum");
 
-    const response = await supertest(app)
-      .get("/companies")
-      .set("Authorization", "Bearer " + token);
-
-    expect(response.status).toBe(401);
-    expect(response.body).toStrictEqual({
-      Error: "Invalid Token",
-    });
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(2);
   });
 
-  it("Return: Body error, no permision | Status code: 401", async () => {
-    const response = await supertest(app)
-      .get("/companies")
-      .set("Authorization", "Bearer " + tokenCompany);
+  it("Return: Companies as JSON response category blACk | Status code: 200", async () => {
+    const response = await supertest(app).get("/averts?category=blACk");
 
-    expect(response.status).toBe(401);
-    expect(response.body).toStrictEqual({
-      Error: "You are not allowed to access this information",
-    });
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(3);
   });
 }); */
