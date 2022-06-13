@@ -8,7 +8,7 @@ export class CategoryAdvert {
   readonly id: string;
 
   @Column()
-  title: string;
+  title: string; //Aqui precisa ser único e padronizado.
 
   @Column("float")
   price: number;

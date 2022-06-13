@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { AnySchema } from "yup";
-import { Company } from "../entities/companies.entity";
-import { ICompany } from "../interfaces/companies";
 
 const validateSchema =
   (schema: AnySchema) =>

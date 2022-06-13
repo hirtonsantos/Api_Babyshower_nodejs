@@ -8,19 +8,20 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-const administratorLoginService = async ({ validated }: Request) => {
+const administratorLoginService = async ({ validatedAdmin }: Request) => {
   const administratorRepository = AppDataSource.getRepository(Administrator);
 
   const administrators = await administratorRepository.find();
 
   const administrator = administrators.find(
     (admin) =>
-      admin.email === validated.email || admin.username === validated.username
+      admin.email === validatedAdmin.email ||
+      admin.username === validatedAdmin.username
   );
 
   if (
     !administrator ||
-    !(await administrator.comparePwd(validated.passwordHash))
+    !(await administrator.comparePwd(validatedAdmin.passwordHash))
   ) {
     throw new AppError(401, { Error: "User not authorized" });
   }
