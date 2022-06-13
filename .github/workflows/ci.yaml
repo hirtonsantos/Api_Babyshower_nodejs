@@ -1,15 +1,29 @@
 name: Node.js CI
 
-on: [push]
+on:
+  pull_request:
+    branches:
+      - development
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node
         uses: actions/setup-node@v3
         with:
           node-version: "16.x"
-      - run: yarn test
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Build
+        run: yarn run build --if-present
+
+      - name: Test
+        run: yarn test --coverage
