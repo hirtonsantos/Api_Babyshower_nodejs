@@ -1,9 +1,42 @@
-const administratorLoginService = () => {
-    try {
-        
-    } catch (error) {
-        
-    }
-}
+import { Request } from "express";
+import { AppDataSource } from "../../data-source";
+import { Administrator } from "../../entities/administrators.entity";
+import jwt from "jsonwebtoken";
+import { AppError } from "../../errors/appError";
 
-export default administratorLoginService
+import * as dotenv from "dotenv";
+
+dotenv.config();
+
+const administratorLoginService = async ({ validatedAdmin }: Request) => {
+  const administratorRepository = AppDataSource.getRepository(Administrator);
+
+  const administrators = await administratorRepository.find();
+
+  const administrator = administrators.find(
+    (adm) =>
+      adm.email === validatedAdmin.email ||
+      adm.username === validatedAdmin.username
+  );
+
+  if (
+    !administrator ||
+    !(await administrator.comparePwd(validatedAdmin.password))
+  ) {
+    throw new AppError(401, { Error: "User not authorized" });
+  }
+
+  console.log(validatedAdmin.password);
+
+  const token = jwt.sign(
+    { id: administrator.id },
+    String(process.env.SECRET_KEY),
+    { expiresIn: process.env.EXPIRES_IN }
+  );
+
+  return {
+    id: administrator.id,
+    access_token: token,
+  };
+};
+export default administratorLoginService;

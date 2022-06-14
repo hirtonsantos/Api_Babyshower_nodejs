@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { AnySchema } from "yup";
 
-const validateSchema =
+const validateSchemaAdm =
   (schema: AnySchema) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -10,7 +10,7 @@ const validateSchema =
         stripUnknown: true,
       });
 
-      req.validated = validated;
+      req.validatedAdmin = validated;
 
       return next();
     } catch (err) {
@@ -20,4 +20,4 @@ const validateSchema =
     }
   };
 
-export default validateSchema;
+export default validateSchemaAdm;

@@ -486,3 +486,446 @@ import { CategoryAdvert } from "../../entities/categoryAdverts.entity";
     expect(response.body).toHaveLength(3);
   });
 }); */
+
+/* describe("Get advert route | Integration Test", () => {
+  let connection: DataSource;
+
+  let tokenCompany: string;
+  let tokenAdm: string;
+  let tokenOtherCompany: string;
+  let advert: Advert;
+
+  beforeAll(async () => {
+    await AppDataSource.initialize()
+      .then((res) => (connection = res))
+      .catch((err) => {
+        console.error("Error during Data Source initialization", err);
+      });
+
+    const newInstance = (generate: ICompany | IAdministrator): any => {
+      const { password, ...newPayload } = generate;
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    };
+
+    //add admnistrator
+    const admRepo = connection.getRepository(Administrator);
+    let adm: Administrator = Object.assign(
+      new Administrator(),
+      newInstance(generateAdministrator())
+    );
+    adm = await admRepo.save(adm);
+    tokenAdm = generateToken(adm.id as string);
+
+    //insert logged company
+    const companyRepo = connection.getRepository(Company);
+    let company = Object.assign(new Company(), newInstance(generateCompany()));
+    company = await companyRepo.save(company);
+    tokenCompany = generateToken(company.id as string);
+
+    //insert otherCompany
+    let otherCompany = Object.assign(
+      new Company(),
+      newInstance(generateCompany())
+    );
+    otherCompany = await companyRepo.save(otherCompany);
+    tokenOtherCompany = generateToken(otherCompany.id as string);
+
+    //insert newAdvert for company
+    const advertRepo = connection.getRepository(Advert);
+    const categoryRepo = connection.getRepository(CategoryAdvert);
+    const payloadAdvert = generateAdvert();
+    const category = await categoryRepo.findOneBy({
+      title: "Premium",
+    });
+
+    advert = await advertRepo.save(
+      Object.assign(new Advert(), {
+        ...payloadAdvert,
+        company: company,
+        category: category,
+      })
+    );
+  });
+
+  afterAll(async () => {
+    await connection.destroy();
+  });
+
+  it("Return: Advert as JSON response | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + tokenCompany);
+    const { company, category, ...newAdvert } = advert;
+    expect(response.status).toBe(200);
+    expect(response.body).not.toHaveProperty("passwordHash");
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        ...newAdvert,
+        companyId: company.id,
+        category: category.title,
+      })
+    );
+  });
+
+  it("Return: Advert as JSON response | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + tokenAdm);
+    const { company, category, ...newAdvert } = advert;
+    expect(response.status).toBe(200);
+    expect(response.body).not.toHaveProperty("passwordHash");
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        ...newAdvert,
+        companyId: company.id,
+        category: category.title,
+      })
+    );
+  });
+
+  it("Return: Body error, missing token | Status code: 400", async () => {
+    const response = await supertest(app).get(`/adverts/${advert.id}`);
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({
+      Error: "Missing authorization token",
+    });
+  });
+
+  it("Return: Body error, invalid token | Status code: 401", async () => {
+    const token = "invalidToken";
+
+    const response = await supertest(app)
+      .get(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + token);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
+  });
+
+  it("Return: Body error, no permision | Status code: 403", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + tokenOtherCompany);
+
+    expect(response.status).toBe(403);
+    expect(response.body).toStrictEqual({
+      Error: "You can't access information of another company",
+    });
+  });
+
+  it("Return: Body error, not Found | Status code: 404", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/${"idNotExistent"}`)
+      .set("Authorization", "Bearer " + tokenCompany);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toStrictEqual({
+      Message: "Company not found",
+    });
+  });
+}); */
+
+/* describe("Update advert route | Integration Test", () => {
+  let connection: DataSource;
+
+  let tokenAdm: string;
+  let tokenCompany: string;
+  let tokenOtherCompany: string;
+  let advert: Advert;
+
+  beforeAll(async () => {
+    await AppDataSource.initialize()
+      .then((res) => (connection = res))
+      .catch((err) => {
+        console.error("Error during Data Source initialization", err);
+      });
+
+    const newInstance = (generate: ICompany | IAdministrator): any => {
+      const { password, ...newPayload } = generate;
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    };
+
+    //add admnistrator
+    const admRepo = connection.getRepository(Administrator);
+    let adm = Object.assign(
+      new Administrator(),
+      newInstance(generateAdministrator())
+    );
+    adm = await admRepo.save(adm);
+    tokenAdm = generateToken(adm.id as string);
+
+    //add company
+    const companyRepo = connection.getRepository(Company);
+    let company = Object.assign(new Company(), newInstance(generateCompany()));
+    company = await companyRepo.save(company);
+    tokenCompany = generateToken(company.id as string);
+
+    //add otherCompany
+    let otherCompany = Object.assign(
+      new Company(),
+      newInstance(generateCompany())
+    );
+    otherCompany = await companyRepo.save(otherCompany);
+    tokenOtherCompany = generateToken(otherCompany.id as string);
+
+    //add advert for company
+    const advertRepo = connection.getRepository(Advert);
+    const categoryRepo = connection.getRepository(CategoryAdvert);
+    const payloadAdvert = generateAdvert();
+    const category = await categoryRepo.findOneBy({
+      title: "Premium",
+    });
+
+    advert = await advertRepo.save(
+      Object.assign(new Advert(), {
+        ...payloadAdvert,
+        company: company,
+        category: category,
+      })
+    );
+  });
+
+  afterAll(async () => {
+    await connection.destroy();
+  });
+
+  it("Return: No body response | Status code: 204", async () => {
+    const newInformation = generateAdvert();
+
+    const response = await supertest(app)
+      .patch(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + tokenCompany)
+      .send({ ...newInformation });
+
+    const { category, ...newPayload } = newInformation;
+
+    const advertRepo = connection.getRepository(Advert);
+    const updatedAdvert = await advertRepo.findOneBy({ id: advert.id });
+
+    expect(response.status).toBe(204);
+    expect(updatedAdvert?.category.title).toStrictEqual(category);
+    expect(updatedAdvert).toEqual(expect.objectContaining({ ...newPayload }));
+  });
+
+  it("Return: No body response updating by ADM | Status code: 204", async () => {
+    const newInformation = generateAdvert();
+
+    const response = await supertest(app)
+      .patch(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + tokenAdm)
+      .send({ ...newInformation });
+
+    const { category, ...newPayload } = newInformation;
+
+    const advertRepo = connection.getRepository(Advert);
+    const updatedAdvert = await advertRepo.findOneBy({ id: advert.id });
+
+    expect(response.status).toBe(204);
+    expect(updatedAdvert?.category.title).toStrictEqual(category);
+    expect(updatedAdvert).toEqual(expect.objectContaining({ ...newPayload }));
+  });
+
+  it("Return: Body error, missing token | Status code: 400", async () => {
+    const response = await supertest(app)
+      .patch(`/adverts/${advert.id}`)
+      .send({ ...generateAdvert() });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({
+      Error: "Missing authorization token.",
+    });
+  });
+
+  it("Return: Body error, invalid information | Status code: 400", async () => {
+    const newInformation = { title: 126, apliedPrice: "1263" };
+
+    const response = await supertest(app)
+      .patch(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + tokenCompany)
+      .send({ ...newInformation });
+
+    expect(response.status).toBe(400);
+  });
+
+  it("Return: Body error, invalid token | Status code: 401", async () => {
+    const token = "invalidToken";
+
+    const response = await supertest(app)
+      .patch(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + token)
+      .send({ ...generateAdvert() });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
+  });
+
+  it("Return: Body error, no permision | Status code: 403", async () => {
+    const response = await supertest(app)
+      .patch(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + tokenOtherCompany)
+      .send({ ...generateAdvert() });
+
+    expect(response.status).toBe(403);
+    expect(response.body).toStrictEqual({
+      Error: "You can't access information of another company",
+    });
+  });
+
+  it("Return: Body error, advert not Found | Status code: 404", async () => {
+    const response = await supertest(app)
+      .patch(`/adverts/${"idNotExist"}`)
+      .set("Authorization", "Bearer " + tokenCompany)
+      .send({ ...generateCompany() });
+
+    expect(response.status).toBe(404);
+    expect(response.body).toStrictEqual({
+      Message: "Advert not found",
+    });
+  });
+}); */
+
+/* describe("Delete advert route | Integration Test", () => {
+  let connection: DataSource;
+
+  let tokenAdm: string;
+  let tokenCompany: string;
+  let tokenOtherCompany: string;
+  let advert: Advert;
+
+  beforeEach(async () => {
+    await AppDataSource.initialize()
+      .then((res) => (connection = res))
+      .catch((err) => {
+        console.error("Error during Data Source initialization", err);
+      });
+
+    const newInstance = (generate: ICompany | IAdministrator): any => {
+      const { password, ...newPayload } = generate;
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    };
+
+    //add admnistrator
+    const admRepo = connection.getRepository(Administrator);
+    let adm = Object.assign(
+      new Administrator(),
+      newInstance(generateAdministrator())
+    );
+    adm = await admRepo.save(adm);
+    tokenAdm = generateToken(adm.id as string);
+
+    //add company
+    const companyRepo = connection.getRepository(Company);
+    let company = Object.assign(new Company(), newInstance(generateCompany()));
+    company = await companyRepo.save(company);
+    tokenCompany = generateToken(company.id as string);
+
+    //add otherCompany
+    let otherCompany = Object.assign(
+      new Company(),
+      newInstance(generateCompany())
+    );
+    otherCompany = await companyRepo.save(otherCompany);
+    tokenOtherCompany = generateToken(otherCompany.id as string);
+
+    //add advert for company
+    const advertRepo = connection.getRepository(Advert);
+    const categoryRepo = connection.getRepository(CategoryAdvert);
+    const payloadAdvert = generateAdvert();
+    const category = await categoryRepo.findOneBy({
+      title: "Premium",
+    });
+
+    advert = await advertRepo.save(
+      Object.assign(new Advert(), {
+        ...payloadAdvert,
+        company: company,
+        category: category,
+      })
+    );
+  });
+
+  afterEach(async () => {
+    await connection.destroy();
+  });
+
+  it("Return: No body response | Status code: 204", async () => {
+    const response = await supertest(app)
+      .delete(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + tokenCompany);
+
+    const advertRepo = connection.getRepository(Advert);
+    const deletedAdvert = await advertRepo.findOneBy({ id: advert.id });
+
+    expect(response.status).toBe(204);
+    expect(deletedAdvert).toBeFalsy;
+  });
+
+  it("Return: No body response updating by ADM | Status code: 204", async () => {
+    const response = await supertest(app)
+      .delete(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + tokenAdm);
+
+    const advertRepo = connection.getRepository(Advert);
+    const deletedAdvert = await advertRepo.findOneBy({ id: advert.id });
+
+    expect(response.status).toBe(204);
+    expect(deletedAdvert).toBeFalsy;
+  });
+
+  it("Return: Body error, missing token | Status code: 400", async () => {
+    const response = await supertest(app).delete(`/adverts/${advert.id}`);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({
+      Error: "Missing authorization token.",
+    });
+  });
+
+  it("Return: Body error, invalid token | Status code: 401", async () => {
+    const token = "invalidToken";
+
+    const response = await supertest(app)
+      .delete(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + token);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
+  });
+
+  it("Return: Body error, no permision | Status code: 403", async () => {
+    const response = await supertest(app)
+      .delete(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + tokenOtherCompany);
+
+    expect(response.status).toBe(403);
+    expect(response.body).toStrictEqual({
+      Error: "You can't access information of another company",
+    });
+  });
+
+  it("Return: Body error, advert not Found | Status code: 404", async () => {
+    const response = await supertest(app)
+      .delete(`/adverts/${"idNotExist"}`)
+      .set("Authorization", "Bearer " + tokenCompany);
+
+    expect(response.status).toBe(404);
+    expect(response.body).toStrictEqual({
+      Message: "Advert not found",
+    });
+  });
+}); */

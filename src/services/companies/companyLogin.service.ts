@@ -1,9 +1,12 @@
 import { ICompanyLogin } from "../../interfaces/companies";
 import { AppDataSource } from "../../data-source";
 import { Company } from "../../entities/companies.entity";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { AppError } from "../../errors/appError";
+
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 const companyLoginService = async ({ email, password }: ICompanyLogin) => {
   const companyRepository = AppDataSource.getRepository(Company);
