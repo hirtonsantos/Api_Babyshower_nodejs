@@ -6,6 +6,7 @@ export interface IAdministrator {
 
 export interface IAdministratorLogin {
   email: string;
+  username: string;
   password: string;
 }
 

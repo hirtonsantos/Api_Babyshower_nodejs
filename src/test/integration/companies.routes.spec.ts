@@ -15,7 +15,6 @@ import { hashSync } from "bcrypt";
 import { verify } from "jsonwebtoken";
 import { Administrator } from "../../entities/administrators.entity";
 
-/*
 describe("Create company route | Integration Test", () => {
   let connection: DataSource;
 
@@ -139,9 +138,10 @@ describe("Login company route | Integration Test", () => {
     expect(response.status).toBe(400);
   });
 });
-*/
 
-/* describe("Get companies route | Integration Test", () => {
+/*
+
+describe("Get companies route | Integration Test", () => {
   let connection: DataSource;
 
   let companies: Company[] = [];
@@ -272,9 +272,13 @@ describe("Login company route | Integration Test", () => {
       Error: "You are not allowed to access this information",
     });
   });
-}); */
+});
 
-/* describe("Get company route | Integration Test", () => {
+*/
+
+/*
+
+describe("Get company route | Integration Test", () => {
   let connection: DataSource;
 
   let tokenCompany: string;
@@ -397,9 +401,13 @@ describe("Login company route | Integration Test", () => {
       Message: "Company not found",
     });
   });
-}); */
+});
 
-/* describe("Update company route | Integration Test", () => {
+*/
+
+/*
+
+describe("Update company route | Integration Test", () => {
   let connection: DataSource;
 
   let tokenAdm: string;
@@ -585,9 +593,11 @@ describe("Login company route | Integration Test", () => {
       Error: "Key cnpj or email or username already exists",
     });
   });
-}); */
+});
+*/
 
-/* describe("Delete company route | Integration Test", () => {
+/*
+describe("Delete company route | Integration Test", () => {
   let connection: DataSource;
 
   let tokenAdm: string;
@@ -702,4 +712,5 @@ describe("Login company route | Integration Test", () => {
       Message: "Company not found",
     });
   });
-}); */
+});
+*/

@@ -8,8 +8,7 @@ import { AppDataSource } from "../../data-source";
 import { hashSync } from "bcrypt";
 import { verify } from "jsonwebtoken";
 
-/*
-  describe("Create administrator route | Integration Test", () => {
+describe("Create administrator route | Integration Test", () => {
   let connection: DataSource;
 
   const firstAdministrator: Partial<IAdministrator> = generateAdministrator();
@@ -124,9 +123,7 @@ import { verify } from "jsonwebtoken";
     });
   });
 });
-*/
 
-/*
 describe("Login administrator route | Integration Test", () => {
   let connection: DataSource;
 
@@ -141,11 +138,11 @@ describe("Login administrator route | Integration Test", () => {
       });
 
     const administratorRepo = connection.getRepository(Administrator);
-    const { passwordHash, ...newPayload } = payload;
+    const { password, ...newPayload } = payload;
 
     administrator = Object.assign(new Administrator(), {
       ...newPayload,
-      passwordHash: hashSync(passwordHash as string, 8),
+      passwordHash: hashSync(password as string, 8),
     });
     administrator = await administratorRepo.save(administrator);
   });
@@ -155,11 +152,13 @@ describe("Login administrator route | Integration Test", () => {
   });
 
   it("Return: token as JSON response | Status code: 200", async () => {
-    const { email, passwordHash } = payload;
+    const { email, password } = payload;
 
     const response = await supertest(app)
       .post("/administrators/login")
-      .send({ email, passwordHash });
+      .send({ email, password });
+
+    console.log(response.error);
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("id");
@@ -170,11 +169,11 @@ describe("Login administrator route | Integration Test", () => {
   });
 
   it("Return: token as JSON response | Status code: 200", async () => {
-    const { username, passwordHash } = payload;
+    const { username, password } = payload;
 
     const response = await supertest(app)
       .post("/administrators/login")
-      .send({ username, passwordHash });
+      .send({ username, password });
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("id");
@@ -189,7 +188,7 @@ describe("Login administrator route | Integration Test", () => {
 
     const response = await supertest(app)
       .post("/administrators/login")
-      .send({ email, passwordHash: "wrongPassword" });
+      .send({ email, password: "wrongPassword" });
 
     expect(response.status).toBe(401);
     expect(response.body).toStrictEqual({
@@ -208,13 +207,12 @@ describe("Login administrator route | Integration Test", () => {
   });
 
   it("Return: Body error, incomplet keys | Status code: 400", async () => {
-    const { passwordHash } = payload;
+    const { password } = payload;
 
     const response = await supertest(app)
       .post("/administrators/login")
-      .send({ passwordHash });
+      .send({ password });
 
     expect(response.status).toBe(400);
   });
 });
-*/

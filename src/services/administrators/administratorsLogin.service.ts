@@ -15,16 +15,18 @@ const administratorLoginService = async ({ validatedAdmin }: Request) => {
 
   const administrator = administrators.find(
     (adm) =>
-      adm.username === validatedAdmin.username ||
-      adm.email === validatedAdmin.email
+      adm.email === validatedAdmin.email ||
+      adm.username === validatedAdmin.username
   );
 
   if (
     !administrator ||
-    !(await administrator.comparePwd(validatedAdmin.passwordHash))
+    !(await administrator.comparePwd(validatedAdmin.password))
   ) {
     throw new AppError(401, { Error: "User not authorized" });
   }
+
+  console.log(validatedAdmin.password);
 
   const token = jwt.sign(
     { id: administrator.id },
