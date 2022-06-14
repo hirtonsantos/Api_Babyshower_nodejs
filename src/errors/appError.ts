@@ -1,10 +1,10 @@
 import { Response } from "express";
 
-export class AppError extends Error {
-  statusCode;
+export class AppError {
+  public statusCode: number;
+  public message: Record<string, any>;
 
-  constructor(statusCode: number, message: string) {
-    super();
+  constructor(statusCode: number, message: Record<string, any>) {
     this.statusCode = statusCode;
     this.message = message;
   }
@@ -13,9 +13,5 @@ export class AppError extends Error {
 export const handleError = (err: AppError, res: Response) => {
   const { statusCode, message } = err;
 
-  return res.status(statusCode).json({
-    status: "error",
-    statusCode,
-    message,
-  });
+  return res.status(statusCode).json(message);
 };
