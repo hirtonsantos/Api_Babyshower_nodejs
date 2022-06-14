@@ -15,6 +15,7 @@ const verifyToken = async (
     const {id} = req.params 
 
     const adms = await admRepository.find()
+    
     const companies = await companiesRepository.find()
 
     const admLogged = adms.find(adm => adm.id === req.decoded.id)
