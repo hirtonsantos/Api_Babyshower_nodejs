@@ -404,13 +404,7 @@ describe("Get companies route | Integration Test", () => {
 
 */
 
-<<<<<<< HEAD
  describe("Get company route | Integration Test", () => {
-=======
-/*
-
-describe("Get company route | Integration Test", () => {
->>>>>>> development
   let connection: DataSource;
 
   let tokenCompany: string;
@@ -535,13 +529,8 @@ describe("Get company route | Integration Test", () => {
       Message: "Company not found",
     });
   });
-<<<<<<< HEAD
 }); 
-=======
-});
->>>>>>> development
 
-*/
 
 /*
 
