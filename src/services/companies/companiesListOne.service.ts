@@ -22,8 +22,6 @@ const companiesListOneService = async (companyId: string) => {
         logoImage, 
         adverts: `/adverts/byCompany/${id}`
     }
-
-    // return account
 }
 
 export default companiesListOneService
