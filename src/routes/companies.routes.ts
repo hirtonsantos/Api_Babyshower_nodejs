@@ -3,7 +3,9 @@ import { Router } from "express";
 import validateSchema from "../middlewares/validateSchema.middleware";
 import { registerCompanySchema } from "../schemas/company/renameCompany.schema";
 import verifyUniqueValuesMW from "../middlewares/companies/verifyUniqueValues.middleware";
-import loginUserSchema from "../schemas/company/loginUserSchema.schema"
+import loginUserSchema from "../schemas/company/loginUserSchema.schema";
+import verifyToken from "../middlewares/companies/verifyToken.middleware";
+import validateAdmToken from "../middlewares/administrators/authAdm.middelware";
 
 import companiesListController from "../controllers/companies/companiesList.controller";
 import companyListOneController from "../controllers/companies/companiesListOne.controller";
@@ -23,7 +25,10 @@ export const companiesRoutes = () => {
   );
   routes.post("/login", validateSchema(loginUserSchema), companyLoginController);
   routes.get("/", companiesListController);
-  routes.get("/:id", companyListOneController);
+  routes.get("/:id", 
+    validateAdmToken,
+    verifyToken,
+    companyListOneController);
   routes.patch("/:id", companyUpdateController);
   routes.delete("/:id", companyDeleteController);
 
