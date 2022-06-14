@@ -8,7 +8,7 @@ import { AppDataSource } from "../../data-source";
 import { hashSync } from "bcrypt";
 import { verify } from "jsonwebtoken";
 
-  describe("Create administrator route | Integration Test", () => {
+describe("Create administrator route | Integration Test", () => {
   let connection: DataSource;
 
   const firstAdministrator: Partial<IAdministrator> = generateAdministrator();
@@ -122,9 +122,9 @@ import { verify } from "jsonwebtoken";
       error: "Key email or username already exists",
     });
   });
-}); 
+});
 
-/* describe("Login administrator route | Integration Test", () => {
+describe("Login administrator route | Integration Test", () => {
   let connection: DataSource;
 
   let payload = generateAdministrator();
@@ -157,6 +157,8 @@ import { verify } from "jsonwebtoken";
     const response = await supertest(app)
       .post("/administrators/login")
       .send({ email, password });
+
+    console.log(response.error);
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("id");
@@ -213,4 +215,4 @@ import { verify } from "jsonwebtoken";
 
     expect(response.status).toBe(400);
   });
-}); */
+});
