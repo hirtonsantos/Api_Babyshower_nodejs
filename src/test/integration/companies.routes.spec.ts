@@ -15,7 +15,7 @@ import { hashSync } from "bcrypt";
 import { verify } from "jsonwebtoken";
 import { Administrator } from "../../entities/administrators.entity";
 
-describe("Create company route | Integration Test", () => {
+  describe("Create company route | Integration Test", () => {
   let connection: DataSource;
 
   beforeAll(async () => {
@@ -138,9 +138,7 @@ describe("Login company route | Integration Test", () => {
     expect(response.status).toBe(400);
   });
 });
-
 /*
-
 describe("Get companies route | Integration Test", () => {
   let connection: DataSource;
 
@@ -272,13 +270,9 @@ describe("Get companies route | Integration Test", () => {
       Error: "You are not allowed to access this information",
     });
   });
-});
+});*/
 
-*/
-
-/*
-
-describe("Get company route | Integration Test", () => {
+ describe("Get company route | Integration Test", () => {
   let connection: DataSource;
 
   let tokenCompany: string;
@@ -401,9 +395,8 @@ describe("Get company route | Integration Test", () => {
       Message: "Company not found",
     });
   });
-});
+}); 
 
-*/
 
 /*
 
