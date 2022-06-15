@@ -1,17 +1,23 @@
 import { Response, Request } from "express"
 import { AppError, handleError } from "../../errors/appError"
+import jwt from "jsonwebtoken";
 import createMessageService from "../../services/chat/messageCreate.service"
+import { getUserId } from "../../test/utils/getUserId";
 
 const createMessageController = async (req: Request, res: Response) => {
     try {
 
         const other_parent_id = Number(req.params.id)
         const data = req.body
-        const user_id = 2
+        let user_id = 1
+
+        let token = req.headers.authorization?.replace('Bearer', '').trim()!;
+
+        getUserId(token, res)
 
         const messageData = await createMessageService(data, other_parent_id, user_id)
 
-        return res.json(messageData)
+        return res.status(201).json(messageData)
         
     } catch (error) {
         if (error instanceof AppError) {
