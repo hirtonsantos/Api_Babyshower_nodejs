@@ -138,7 +138,7 @@ describe("Login company route | Integration Test", () => {
     expect(response.status).toBe(400);
   });
 });
-/*
+
 describe("Get companies route | Integration Test", () => {
   let connection: DataSource;
 
@@ -231,7 +231,7 @@ describe("Get companies route | Integration Test", () => {
 
   it("Return: Companies as JSON response page 3 perPage 4 | Status code: 200", async () => {
     const response = await supertest(app)
-      .get("/companies?page=2&perPage=4")
+      .get("/companies?page=3&perPage=4")
       .set("Authorization", "Bearer " + tokenAdm);
     const { passwordHash, adverts, comparePwd, ...company } = newCompany;
     expect(response.status).toBe(200);
@@ -270,7 +270,7 @@ describe("Get companies route | Integration Test", () => {
       Error: "You are not allowed to access this information",
     });
   });
-});*/
+});
 
  describe("Get company route | Integration Test", () => {
   let connection: DataSource;

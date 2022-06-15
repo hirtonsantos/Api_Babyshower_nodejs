@@ -13,6 +13,7 @@ import companyDeleteController from "../controllers/companies/companyDeleteSelf.
 import companyLoginController from "../controllers/companies/companyLogin.controller";
 import companyRegisterController from "../controllers/companies/companyRegister.controller";
 import companyUpdateController from "../controllers/companies/companyUpdate.controller";
+import verifyIfAdm from "../middlewares/administrators/verifyIfAdm.middleware";
 
 const routes = Router();
 
@@ -24,7 +25,10 @@ export const companiesRoutes = () => {
     companyRegisterController
   );
   routes.post("/login", validateSchema(loginUserSchema), companyLoginController);
-  routes.get("/", companiesListController);
+  routes.get("/", 
+    validateAdmToken, 
+    verifyIfAdm, 
+    companiesListController);
   routes.get("/:id", 
     validateAdmToken,
     verifyToken,
