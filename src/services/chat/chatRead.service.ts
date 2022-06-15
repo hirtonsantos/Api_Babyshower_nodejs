@@ -12,15 +12,15 @@ const chatReadService = async (
   const chatRepository = AppDataSource.getRepository(Chat);
   const msgRepository = AppDataSource.getRepository(Message);
 
-  let chat = await chatRepository
-    .find({
-      where: {
-        id: chat_id,
-      },
-    })
-    .catch((_) => {
-      throw new AppError(404, { message: "Chat not found" });
-    });
+  let chat = await chatRepository.find({
+    where: {
+      id: chat_id,
+    },
+  });
+
+  if (!chat) {
+    throw new AppError(404, { message: "Chat not found" });
+  }
 
   const chatCurrent = chat[0];
 
@@ -36,6 +36,15 @@ const chatReadService = async (
     }
     return true;
   });
+
+  if (
+    chatCurrent.parent_user != user_id ||
+    chatCurrent.parent_user != user_id
+  ) {
+    throw new AppError(403, {
+      Error: "You can't access information of another user",
+    });
+  }
 
   if (page * perPage > chatCurrent.messages.length) {
     return {
