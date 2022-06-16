@@ -10,7 +10,7 @@ export const chatRoutes = () => {
   routes.get("/", chatListController);
   routes.post("/:id", createMessageController);
   routes.get("/:id", chatReadController);
-  routes.put("/:id", chatArchiveController);
+  routes.patch("/:id", chatArchiveController);
 
   return routes;
 };
