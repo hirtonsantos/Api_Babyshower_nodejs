@@ -14,9 +14,6 @@ export interface IFile extends Express.Multer.File {
 
 const MAX_SIZE_TWO_MEGABYTES = 2 * 1024 * 1024
 
-AWS.config.update({accessKeyId: "AKIAZJGIMKJIA5DWYY5O",
-secretAccessKey: "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"})
-
 const storageTypes = {
     local: multer.diskStorage({
       destination: (req, file, cb) => {
