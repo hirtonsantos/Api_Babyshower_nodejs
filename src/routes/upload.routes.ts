@@ -2,6 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 import path from "path";
 import multerConfig from "../config/multer"
+import { deleteImageController } from "../controllers/upload/deleteImage.controller";
 import { postImageController } from "../controllers/upload/postImage.controller";
 
 const routes = Router();
@@ -18,6 +19,7 @@ const fields = [
 
 export const uploadRoutes = () => {
   routes.post("/", multer(multerConfig).fields(fields), postImageController)
+  routes.delete("/", deleteImageController)
 
   return routes;
 };

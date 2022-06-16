@@ -7,9 +7,8 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-if (!fs.existsSync("tmp")){
-    fs.mkdirSync("tmp")
-    fs.mkdirSync("tmp/uploads");
+if (!fs.existsSync("tmp/uploads")){
+    fs.mkdirSync("tmp/uploads", {recursive: true});
 }
 
 export const AppDataSource =
