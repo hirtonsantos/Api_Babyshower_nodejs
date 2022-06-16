@@ -4,7 +4,6 @@ import { advertsRoutes } from "./adverts.routes";
 import { companiesRoutes } from "./companies.routes";
 import { chatRoutes } from "./chat.route";
 import { uploadRoutes } from "./upload.routes";
-import authUser from "../middlewares/authUser.middleware";
 
 export const appRoutes = (app: Express) => {
   app.use("/administrators", administratorRoutes());
