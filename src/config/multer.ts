@@ -5,6 +5,7 @@ import multerS3 from "multer-s3"
 import { Request } from "express"
 import * as dotenv from "dotenv";
 import { v4 as uuid } from "uuid";
+import * as bcrypt from "bcrypt";
 
 dotenv.config();
 
@@ -21,7 +22,8 @@ const storageTypes = {
       },
       filename: (req: Request, file: IFile, cb: any) => {
         const id = uuid()
-        file.key = `${id}-${file.fieldname}`
+        const idUser = req.decoded.id
+        file.key = `${id}-${bcrypt.hashSync(idUser as string, 10)}-${file.fieldname+file.mimetype.replace("image/",".")}`
 
         cb(null, file.key)
       },
@@ -33,7 +35,8 @@ const storageTypes = {
       acl: "public-read",
       key: (req: Request, file, cb) => {
         const id = uuid()
-        const fileName = `${id}-${file.fieldname}`
+        const idUser = req.decoded.id
+        const fileName = `${id}-${bcrypt.hashSync(idUser as string, 10)}-${file.fieldname}`
 
         cb(null, fileName)
       },
