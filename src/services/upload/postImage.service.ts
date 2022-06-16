@@ -7,6 +7,6 @@ export const postImageService = (files: object[][]) => {
 
     if(!url) url = `${process.env.APP_URL}/files/${key}` as string
     
-    return {msgSuccess: "File sent successfully!", url}
+    return {msgSuccess: "File sent successfully!",key, url}
 
 }

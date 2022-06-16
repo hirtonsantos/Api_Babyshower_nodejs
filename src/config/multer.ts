@@ -6,6 +6,7 @@ import { Request } from "express"
 import * as dotenv from "dotenv";
 import { v4 as uuid } from "uuid";
 import * as bcrypt from "bcrypt";
+import { AppError } from "../errors/appError"
 
 dotenv.config();
 
@@ -18,12 +19,12 @@ const MAX_SIZE_TWO_MEGABYTES = 2 * 1024 * 1024
 const storageTypes = {
     local: multer.diskStorage({
       destination: (req, file, cb) => {
-        cb(null, path.resolve(__dirname,"..","..", "tmp/uploads"));
+        cb(null, path.resolve(__dirname,"..","..", "tmp","uploads"));
       },
-      filename: (req: Request, file: IFile, cb: any) => {
-        const id = uuid()
+      filename: async (req: Request, file: IFile, cb: any) => {
         const idUser = req.decoded.id
-        file.key = `${id}-${bcrypt.hashSync(idUser as string, 10)}-${file.fieldname+file.mimetype.replace("image/",".")}`
+        const idUserHash = await bcrypt.hash(idUser as string, 10)
+        file.key = `${file.fieldname}@${idUserHash}${file.mimetype.replace("image/",".")}`
 
         cb(null, file.key)
       },
@@ -33,10 +34,10 @@ const storageTypes = {
       bucket: process.env.BUCKET_NAME as string,
       contentType: multerS3.AUTO_CONTENT_TYPE,
       acl: "public-read",
-      key: (req: Request, file, cb) => {
-        const id = uuid()
+      key: async (req: Request, file, cb) => {
         const idUser = req.decoded.id
-        const fileName = `${id}-${bcrypt.hashSync(idUser as string, 10)}-${file.fieldname}`
+        const idUserHash = await bcrypt.hash(idUser as string, 10)
+        const fileName = `${file.fieldname}@${idUserHash}`
 
         cb(null, fileName)
       },
@@ -46,7 +47,7 @@ const storageTypes = {
 const type = process.env.STORAGE_TYPE as string
 
 export default {
-    dest: path.resolve(__dirname,"..","..", "tmp/uploads"),
+    dest: path.resolve(__dirname,"..","..", "tmp","uploads"),
     storage: type === "local" || process.env.NODE_ENV === "test" ?
      storageTypes["local"] : storageTypes["s3"],
     limits: {
@@ -63,7 +64,7 @@ export default {
       if (allowedMimes.includes(file.mimetype)) {
         cb(null, true);
       } else {
-        cb(new Error("Invalid file type."));
+        cb(new AppError(400, {Error: "Invalid file type"}));
       }
     },
   };
