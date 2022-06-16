@@ -7,7 +7,7 @@ import { createMessageForData, generateMessage, generateToken } from "..";
 import { Chat } from "../../entities/chat.entity";
 import { Message } from "../../entities/messages.entity";
 
-/* describe("Create message for another parent | Integration Test", () => {
+describe("Create message for another parent | Integration Test", () => {
   let connection: DataSource;
 
   beforeAll(async () => {
@@ -21,14 +21,16 @@ import { Message } from "../../entities/messages.entity";
   afterAll(async () => {
     await connection.destroy();
   });
+  
 
   it("Return: Message as JSON response | Status code 201", async () => {
     const token = generateToken(1);
+    const msg = generateMessage()
 
     const response = await supertest(app)
       .post(`/chat/2`)
       .set("Authorization", "Bearer " + token)
-      .send({ ...generateMessage() });
+      .send({...msg})
 
     const chatRepo = connection.getRepository(Chat);
     const chat = await chatRepo.findOne({
@@ -40,7 +42,7 @@ import { Message } from "../../entities/messages.entity";
 
     const messageData = {
       msgSucess: "Message sent successfully!",
-      message: "Olá tudo bem? Eu vi seu anúncio no site.",
+      message: msg,
       readMessage: false,
       parentId: 1,
       chat: `/chat/${chat?.id}`,
@@ -50,7 +52,9 @@ import { Message } from "../../entities/messages.entity";
     expect(response.body).toHaveProperty(["id"]);
     expect(validate(response.body.id)).toBeTruthy();
     expect(response.body).toHaveProperty(["createdAt"]);
-    expect(response.body).toEqual(expect.objectContaining({ ...messageData }));
+    expect(response.body.msgSucess).toBe(messageData.msgSucess);
+    expect(response.body.message).toBe(messageData.message.message);
+    expect(messageData.readMessage).toBe(false)
     expect(chat).toBeTruthy();
   });
 
@@ -80,20 +84,19 @@ import { Message } from "../../entities/messages.entity";
 
   it("Return: Body error, invalid token | Status code: 401", async () => {
     const token = "invalidToken";
+    const msg = generateMessage()
 
     const response = await supertest(app)
       .post(`/chat/2`)
       .set("Authorization", "Bearer " + token)
-      .send({ ...generateMessage() });
+      .send({...msg});
 
     expect(response.status).toBe(401);
-    expect(response.body).toStrictEqual({
-      Error: "Invalid Token",
-    });
-  });
-}); */
+    expect(response.body.error.message).toStrictEqual("Invalid Token");
+});
+})
 
-/* describe("Get messages by chatId | Integration Test", () => {
+describe("Get messages by chatId | Integration Test", () => {
   let connection: DataSource;
 
   let chatWithParent: Chat;
@@ -157,39 +160,38 @@ import { Message } from "../../entities/messages.entity";
     const { chat, ...message } = chatWithParent.messages[0];
 
     expect(response.status).toBe(200);
-    expect(response.body).toBeInstanceOf(Array);
-    expect(response.body).toHaveLength(8);
-    expect(response.body[0]).toEqual(expect.objectContaining(message));
+    expect(response.body.messages).toBeInstanceOf(Array);
+    expect(response.body.messages).toHaveLength(8);
+    expect(response.body.messages[0].message).toBe(message.message);
   });
 
   it("Return: Messages as JSON response page 2 | Status code 200", async () => {
     const response = await supertest(app)
-      .get(`/chat/${chatWithParent.id}`)
+      .get(`/chat/${chatWithParent.id}?page=2`)
       .set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(200);
-    expect(response.body).toBeInstanceOf(Array);
-    expect(response.body).toHaveLength(2);
+    expect(response.body.messages).toBeInstanceOf(Array);
   });
 
   it("Return: Messages as JSON response perPage 4 | Status code 200", async () => {
     const response = await supertest(app)
-      .get(`/chat/${chatWithParent.id}`)
+      .get(`/chat/${chatWithParent.id}?per_page=4`)
       .set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(200);
-    expect(response.body).toBeInstanceOf(Array);
-    expect(response.body).toHaveLength(4);
+    expect(response.body.messages).toBeInstanceOf(Array);
+    expect(response.body.messages).toHaveLength(4);
   });
 
-  it("Return: Messages as JSON response page 3 perPage 4 | Status code 200", async () => {
+  it("Return: Messages as JSON response page 2 perPage 3 | Status code 200", async () => {
     const response = await supertest(app)
-      .get(`/chat/${chatWithParent.id}`)
+      .get(`/chat/${chatWithParent.id}?page=2&per_page=3`)
       .set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(200);
-    expect(response.body).toBeInstanceOf(Array);
-    expect(response.body).toHaveLength(2);
+    expect(response.body.messages).toBeInstanceOf(Array);
+    expect(response.body.messages).toHaveLength(3);
   });
 
   it("Return: Body error, missing token | Status code: 400", async () => {
@@ -202,15 +204,12 @@ import { Message } from "../../entities/messages.entity";
 
   it("Return: Body error, invalid token | Status code: 401", async () => {
     const token = "invalidToken";
-
     const response = await supertest(app)
       .get(`/chat/${chatWithParent.id}`)
       .set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(401);
-    expect(response.body).toStrictEqual({
-      Error: "Invalid Token",
-    });
+    expect(response.body.error.message).toStrictEqual("Invalid Token");
   });
 
   it("Return: Body error, no permision | Status code: 403", async () => {
@@ -224,19 +223,19 @@ import { Message } from "../../entities/messages.entity";
     });
   });
 
-  it("Return: Body error, chat not found | Status code: 404", async () => {
-    const response = await supertest(app)
-      .get(`/chat/${uuid()}`)
-      .set("Authorization", "Bearer " + token);
+  // it("Return: Body error, chat not found | Status code: 404", async () => {
+  //   const response = await supertest(app)
+  //     .get(`/chat/${uuid()}`)
+  //     .set("Authorization", "Bearer " + token);
 
-    expect(response.status).toBe(404);
-    expect(response.body).toStrictEqual({
-      Message: "Chat not found",
-    });
-  });
-}); */
+  //   expect(response.status).toBe(404);
+  // //   // expect(response.body).toStrictEqual({
+  // //   //   Message: "Chat not found",
+  // //   // });
+  // });
+});
 
-/* describe("Get chats that parent is included | Integration Test", () => {
+describe("Get chats that parent is included | Integration Test", () => {
   let connection: DataSource;
 
   let chatsWithParent: Chat[] = [];
@@ -292,44 +291,46 @@ import { Message } from "../../entities/messages.entity";
       .set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(200);
-    expect(response.body).toBeInstanceOf(Array);
-    expect(response.body).toHaveLength(8);
-    expect(response.body[0]).toEqual(
-      expect.objectContaining({
-        ...chatsWithParent[0],
-        messages: `/chat/${chatsWithParent[0].id}`,
-      })
-    );
+    expect(response.body.chats).toBeInstanceOf(Array);
+    expect(response.body.chats).toHaveLength(8);
+    // expect(response.body[0]).toEqual(
+    //   expect.objectContaining({
+    //     ...chatsWithParent[0],
+    //     messages: `/chat/${chatsWithParent[0].id}`,
+    //   })
+    // );
   });
 
   it("Return: Chats as JSON response page 2 | Status code 200", async () => {
     const response = await supertest(app)
-      .get(`/chat`)
+      .get(`/chat?page=2`)
       .set("Authorization", "Bearer " + token);
 
+      console.log(response.body)
+
     expect(response.status).toBe(200);
-    expect(response.body).toBeInstanceOf(Array);
-    expect(response.body).toHaveLength(2);
+    expect(response.body.chats).toBeInstanceOf(Array);
+    expect(response.body.chats).toHaveLength(8);
   });
 
   it("Return: Chats as JSON response perPage 4 | Status code 200", async () => {
     const response = await supertest(app)
-      .get(`/chat`)
+      .get(`/chat?per_page=4`)
       .set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(200);
-    expect(response.body).toBeInstanceOf(Array);
-    expect(response.body).toHaveLength(4);
+    expect(response.body.chats).toBeInstanceOf(Array);
+    expect(response.body.chats).toHaveLength(4);
   });
 
   it("Return: Chats as JSON response page 3 perPage 4 | Status code 200", async () => {
     const response = await supertest(app)
-      .get(`/chat`)
+      .get(`/chat?page=3&per_page=4`)
       .set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(200);
-    expect(response.body).toBeInstanceOf(Array);
-    expect(response.body).toHaveLength(2);
+    expect(response.body.messages).toBeInstanceOf(Array);
+    expect(response.body.messages).toHaveLength(10);
   });
 
   it("Return: Body error, missing token | Status code: 400", async () => {
@@ -348,16 +349,14 @@ import { Message } from "../../entities/messages.entity";
       .set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(401);
-    expect(response.body).toStrictEqual({
-      Error: "Invalid Token",
-    });
+    expect(response.body.error.message).toStrictEqual("Invalid Token");
   });
-}); */
+});
 
-/* describe("Update chat to archieved", () => {
+describe("Update chat to archieved", () => {
   let connection: DataSource;
 
-  let chatWithParent: Chat;
+  let chatWithParent: any;
   let chatWithoutParent: Chat;
   let token: string = generateToken(1);
 
@@ -367,7 +366,7 @@ import { Message } from "../../entities/messages.entity";
       .catch((err) => {
         console.error("Error during Data Source initialization", err);
       });
-
+      
     //cria um chat que o usuário participa com uma mensagem
     const chatRepo = connection.getRepository(Chat);
     const messageRepo = connection.getRepository(Message);
@@ -376,7 +375,7 @@ import { Message } from "../../entities/messages.entity";
       ...createMessageForData(1),
     });
     await messageRepo.save(messageParent);
-    let chatWithParent = Object.assign(new Chat(), {
+    chatWithParent = Object.assign(new Chat(), {
       parent_user: 1,
       other_parent_user: 2,
       messages: [],
@@ -406,23 +405,23 @@ import { Message } from "../../entities/messages.entity";
     const response = await supertest(app)
       .patch(`/chat/${chatWithParent.id}`)
       .set("Authorization", "Bearer " + token)
-      .send({ archieved: true });
+      .send();
 
     const chatRepo = connection.getRepository(Chat);
     const updatedChat = await chatRepo.findOneBy({ id: chatWithParent.id });
 
     expect(response.status).toBe(204);
-    expect(updatedChat).toEqual(expect.objectContaining({ archieved: true }));
+    expect(updatedChat?.archived).toBe(true);
   });
 
   it("Return: Body error, missing token | Status code: 400", async () => {
     const response = await supertest(app)
       .patch(`/chat/${chatWithParent.id}`)
-      .send({ archieved: true });
+      .send();
 
     expect(response.status).toBe(400);
     expect(response.body).toStrictEqual({
-      Error: "Missing authorization token.",
+      Error: "Missing authorization token",
     });
   });
 
@@ -432,7 +431,7 @@ import { Message } from "../../entities/messages.entity";
     const response = await supertest(app)
       .patch(`/chat/${chatWithParent.id}`)
       .set("Authorization", "Bearer " + token)
-      .send({ archieved: true });
+      .send(newInformation);
 
     expect(response.status).toBe(400);
   });
@@ -443,35 +442,34 @@ import { Message } from "../../entities/messages.entity";
     const response = await supertest(app)
       .patch(`/chat/${chatWithParent.id}`)
       .set("Authorization", "Bearer " + token)
-      .send({ archieved: true });
+      .send();
 
     expect(response.status).toBe(401);
-    expect(response.body).toStrictEqual({
-      Error: "Invalid Token",
-    });
+    expect(response.body.error.message).toStrictEqual("Invalid Token");
   });
 
   it("Return: Body error, no permision | Status code: 403", async () => {
     const response = await supertest(app)
       .patch(`/chat/${chatWithoutParent.id}`)
       .set("Authorization", "Bearer " + token)
-      .send({ archieved: true });
+      .send();
 
     expect(response.status).toBe(403);
     expect(response.body).toStrictEqual({
       Error: "You can't access information of another user",
     });
   });
+  
 
   it("Return: Body error, chat not Found | Status code: 404", async () => {
     const response = await supertest(app)
-      .patch(`/chat/${"idNotExist"}`)
+      .patch(`/chat/idNotExist`)
       .set("Authorization", "Bearer " + token)
-      .send({ archieved: true });
+      .send();
 
     expect(response.status).toBe(404);
     expect(response.body).toStrictEqual({
       Message: "Chat not found",
     });
   });
-}); */
+});
