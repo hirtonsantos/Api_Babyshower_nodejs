@@ -17,7 +17,7 @@ import { Company } from "../../entities/companies.entity";
 import { Administrator } from "../../entities/administrators.entity";
 import { CategoryAdvert } from "../../entities/categoryAdverts.entity";
 
-/* describe("Create advert route by company | Integration Test", () => {
+describe("Create advert route by company | Integration Test", () => {
   let connection: DataSource;
 
   let tokenAdm: string;
@@ -168,9 +168,9 @@ import { CategoryAdvert } from "../../entities/categoryAdverts.entity";
       Message: "Company not found",
     });
   });
-}); */
+}); 
 
-/* describe("Get adverts by company | Integration Test", () => {
+describe("Get adverts by company | Integration Test", () => {
   let connection: DataSource;
 
   let tokenAdm: string;
@@ -368,7 +368,7 @@ import { CategoryAdvert } from "../../entities/categoryAdverts.entity";
       Message: "Company not found",
     });
   });
-}); */
+}); 
 
 /* describe("Get adverts | Integration Test", () => {
   let connection: DataSource;
