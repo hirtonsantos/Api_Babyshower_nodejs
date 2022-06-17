@@ -5,6 +5,10 @@ import { errorMiddleware } from "./middlewares/error.middleware";
 
 const app = express();
 
+app.use(cors({
+    origin: '*' //incluir vercel do front aqui e api flask
+}))
+
 app.use(express.json());
 appRoutes(app);
 
