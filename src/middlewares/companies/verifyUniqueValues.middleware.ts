@@ -20,7 +20,6 @@ const verifyUniqueValuesMW = async (
     });
   }
 
-  // prettier-ignore
   const emailExists = await companyRepository.findOne({
     where: { email: (req.validated as Company).email },
   });
@@ -31,7 +30,6 @@ const verifyUniqueValuesMW = async (
     });
   }
 
-  // prettier-ignore
   const cnpjExists = await companyRepository.findOne({
     where: { cnpj: (req.validated as Company).cnpj },
   });
