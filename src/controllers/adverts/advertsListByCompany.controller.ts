@@ -1,15 +1,15 @@
 import { Request, Response } from 'express'
 import { AppDataSource } from '../../data-source'
+import { Advert } from '../../entities/adverts.entity'
 import { CategoryAdvert } from '../../entities/categoryAdverts.entity'
 import { AppError, handleError } from '../../errors/appError'
-import paginationMiddleware from '../../middlewares/adverts/pagination.middleware'
 import advertsListByCompanyService from '../../services/adverts/advertsListByCompany.service'
 
 const advertsListByCompanyController = async (req: Request, res: Response) => {
     try {
-        const {companyId} = req.params
+        const {id} = req.params
         
-        const adverts =  await advertsListByCompanyService(companyId) 
+        const adverts =  await advertsListByCompanyService(id) as Advert[]
         
         let page = Number(req.query.page) 
         let perPage = Number(req.query.perPage)
@@ -34,12 +34,14 @@ const advertsListByCompanyController = async (req: Request, res: Response) => {
         
         // if (categoryAdsName){
         //     const adsBycategory = adverts.filter(ad => ad.category === categoryAdsName)
-        //     return res.status(200).send(adsBycategory.splice(initialElement, perPage))             
+        //     const pagePerategory = adsBycategory.splice(initialElement, perPage)
+        //     return res.status(200).send(pagePerategory)             
         // }
-        console.log("adverts=", adverts)
+        // console.log("adverts=", adverts)
         
         const pagination = adverts.splice(initialElement, perPage)
-
+        console.log(pagination)
+        console.log(pagination.map(ad => ad.category))
         
         return res.status(200).send(pagination)
         

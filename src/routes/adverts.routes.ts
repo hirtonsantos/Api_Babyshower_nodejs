@@ -4,6 +4,7 @@ import advertListOneController from "../controllers/adverts/advertListOne.contro
 import advertsListByCompanyController from "../controllers/adverts/advertsListByCompany.controller";
 import advertUpdateController from "../controllers/adverts/advertUpdate.controller";
 import validateAdmToken from "../middlewares/administrators/authAdm.middelware";
+import verifyAdsCompany from "../middlewares/adverts/verifyAdsCompany.middleware";
 import verifyToken from "../middlewares/companies/verifyToken.middleware";
 
 const routes = Router();
@@ -11,16 +12,16 @@ const routes = Router();
 export const advertsRoutes = () => {
   routes.patch("/", advertUpdateController);
   routes.delete("/", advertDeleteController);
-  routes.get("/byCompany/:companyId", 
-    // validateAdmToken,
-    // verifyToken,
+  routes.get("/byCompany/:id", 
+    validateAdmToken,
+    verifyToken,
     advertsListByCompanyController
   );
-  // routes.get("/:id", 
-  //   validateAdmToken,
-  //   verifyToken,
-  //   advertListOneController
-  // )
+  routes.get("/:id", 
+    validateAdmToken,
+    // verifyAdsCompany,
+    advertListOneController
+  );
 
   return routes;
 };

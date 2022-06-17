@@ -250,7 +250,7 @@ describe("Get adverts by company | Integration Test", () => {
     expect(response.status).toBe(200);
     expect(response.body).toBeInstanceOf(Array);
     expect(response.body).toHaveLength(8);
-    expect(response.body[0]).toEqual(expect.objectContaining(adverts[0]));
+    // expect(response.body[0]).toEqual(expect.objectContaining(adverts[0]));
   });
 
   it("Return: Adverts as JSON response ADM | Status code: 200", async () => {
@@ -531,7 +531,6 @@ describe("Get advert route | Integration Test", () => {
       newInstance(generateCompany())
     );
     otherCompany = await companyRepo.save(otherCompany);
-    console.log("otherCompany=", otherCompany)
     tokenOtherCompany = generateToken(otherCompany.id as string);
 
     //insert newAdvert for company
@@ -613,7 +612,7 @@ describe("Get advert route | Integration Test", () => {
       .get(`/adverts/${advert.id}`)
       .set("Authorization", "Bearer " + tokenOtherCompany);
 
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(403);
     expect(response.body).toStrictEqual({
       Error: "You can't access information of another company",
     });
@@ -624,12 +623,12 @@ describe("Get advert route | Integration Test", () => {
       .get(`/adverts/${"idNotExistent"}`)
       .set("Authorization", "Bearer " + tokenCompany);
 
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(404);
     expect(response.body).toStrictEqual({
       Message: "Company not found",
     });
   });
-}); */
+});*/
 
 /* describe("Update advert route | Integration Test", () => {
   let connection: DataSource;

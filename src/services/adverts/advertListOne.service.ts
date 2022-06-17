@@ -5,9 +5,7 @@ const advertListOneService = async (advertId: string) => {
 
     const adsRepository = AppDataSource.getRepository(Advert) 
 
-    const ads = await adsRepository.find()
-
-    const advert = ads.find(ad => ad.id === advertId) 
+    const advert = await adsRepository.findOneBy({id: advertId})
 
     return advert
 }
