@@ -397,9 +397,7 @@ describe("Get companies route | Integration Test", () => {
   });
 }); 
 
-
 /*
-
 describe("Update company route | Integration Test", () => {
   let connection: DataSource;
 
@@ -465,131 +463,130 @@ describe("Update company route | Integration Test", () => {
     expect(updatedCompany).toEqual(expect.objectContaining({ ...newCompany }));
   });
 
-  it("Return: No body response updating by ADM | Status code: 204", async () => {
-    const newInformation = generateCompany();
+  // it("Return: No body response updating by ADM | Status code: 204", async () => {
+  //   const newInformation = generateCompany();
 
-    const response = await supertest(app)
-      .patch(`/companies/${company.id}`)
-      .set("Authorization", "Bearer " + tokenAdm)
-      .send({ ...newInformation });
+  //   const response = await supertest(app)
+  //     .patch(`/companies/${company.id}`)
+  //     .set("Authorization", "Bearer " + tokenAdm)
+  //     .send({ ...newInformation });
 
-    const { password, ...newCompany } = newInformation;
+  //   const { password, ...newCompany } = newInformation;
 
-    const companyRepo = connection.getRepository(Company);
-    const updatedCompany = await companyRepo.findOneBy({ id: company.id });
+  //   const companyRepo = connection.getRepository(Company);
+  //   const updatedCompany = await companyRepo.findOneBy({ id: company.id });
 
-    expect(response.status).toBe(204);
-    expect(updatedCompany).toEqual(expect.objectContaining({ ...newCompany }));
-  });
+  //   expect(response.status).toBe(204);
+  //   expect(updatedCompany).toEqual(expect.objectContaining({ ...newCompany }));
+  // });
 
-  it("Return: Body error, missing token | Status code: 400", async () => {
-    const response = await supertest(app)
-      .patch(`/companies/${company.id}`)
-      .send({ ...generateCompany() });
+  // it("Return: Body error, missing token | Status code: 400", async () => {
+  //   const response = await supertest(app)
+  //     .patch(`/companies/${company.id}`)
+  //     .send({ ...generateCompany() });
 
-    expect(response.status).toBe(400);
-    expect(response.body).toStrictEqual({
-      Error: "Missing authorization token.",
-    });
-  });
+  //   expect(response.status).toBe(400);
+  //   expect(response.body).toStrictEqual({
+  //     Error: "Missing authorization token.",
+  //   });
+  // });
 
-  it("Return: Body error, invalid information | Status code: 400", async () => {
-    const newInformation = { email: "teste", cnpj: "1263" };
+  // it("Return: Body error, invalid information | Status code: 400", async () => {
+  //   const newInformation = { email: "teste", cnpj: "1263" };
 
-    const response = await supertest(app)
-      .patch(`/companies/${company.id}`)
-      .set("Authorization", "Bearer " + tokenCompany)
-      .send({ ...newInformation });
+  //   const response = await supertest(app)
+  //     .patch(`/companies/${company.id}`)
+  //     .set("Authorization", "Bearer " + tokenCompany)
+  //     .send({ ...newInformation });
 
-    expect(response.status).toBe(400);
-  });
+  //   expect(response.status).toBe(400);
+  // });
 
-  it("Return: Body error, invalid token | Status code: 401", async () => {
-    const token = "invalidToken";
+  // it("Return: Body error, invalid token | Status code: 401", async () => {
+  //   const token = "invalidToken";
 
-    const response = await supertest(app)
-      .patch(`/companies/${company.id}`)
-      .set("Authorization", "Bearer " + token)
-      .send({ ...generateCompany() });
+  //   const response = await supertest(app)
+  //     .patch(`/companies/${company.id}`)
+  //     .set("Authorization", "Bearer " + token)
+  //     .send({ ...generateCompany() });
 
-    expect(response.status).toBe(401);
-    expect(response.body).toStrictEqual({
-      Error: "Invalid Token",
-    });
-  });
+  //   expect(response.status).toBe(401);
+  //   expect(response.body).toStrictEqual({
+  //     Error: "Invalid Token",
+  //   });
+  // });
 
-  it("Return: Body error, no permision | Status code: 403", async () => {
-    const response = await supertest(app)
-      .patch(`/companies/${otherCompany.id}`)
-      .set("Authorization", "Bearer " + tokenCompany)
-      .send({ ...generateCompany() });
+  // it("Return: Body error, no permision | Status code: 403", async () => {
+  //   const response = await supertest(app)
+  //     .patch(`/companies/${otherCompany.id}`)
+  //     .set("Authorization", "Bearer " + tokenCompany)
+  //     .send({ ...generateCompany() });
 
-    expect(response.status).toBe(403);
-    expect(response.body).toStrictEqual({
-      Error: "You can't access information of another company",
-    });
-  });
+  //   expect(response.status).toBe(403);
+  //   expect(response.body).toStrictEqual({
+  //     Error: "You can't access information of another company",
+  //   });
+  // });
 
-  it("Return: Body error, company not Found | Status code: 404", async () => {
-    const response = await supertest(app)
-      .patch(`/companies/${adm.id}`)
-      .set("Authorization", "Bearer " + tokenCompany)
-      .send({ ...generateCompany() });
+  // it("Return: Body error, company not Found | Status code: 404", async () => {
+  //   const response = await supertest(app)
+  //     .patch(`/companies/${adm.id}`)
+  //     .set("Authorization", "Bearer " + tokenCompany)
+  //     .send({ ...generateCompany() });
 
-    expect(response.status).toBe(404);
-    expect(response.body).toStrictEqual({
-      Message: "Company not found",
-    });
-  });
+  //   expect(response.status).toBe(404);
+  //   expect(response.body).toStrictEqual({
+  //     Message: "Company not found",
+  //   });
+  // });
 
-  it("Return: Body error, updating duplicate email | Status code: 409", async () => {
-    const newInformation = { ...generateCompany(), email: otherCompany.email };
+  // it("Return: Body error, updating duplicate email | Status code: 409", async () => {
+  //   const newInformation = { ...generateCompany(), email: otherCompany.email };
 
-    const response = await supertest(app)
-      .patch(`/users/${company.id}`)
-      .set("Authorization", "Bearer " + tokenCompany)
-      .send({ ...newInformation });
+  //   const response = await supertest(app)
+  //     .patch(`/users/${company.id}`)
+  //     .set("Authorization", "Bearer " + tokenCompany)
+  //     .send({ ...newInformation });
 
-    expect(response.status).toBe(409);
-    expect(response.body).toStrictEqual({
-      Error: "Key cnpj or email or username already exists",
-    });
-  });
+  //   expect(response.status).toBe(409);
+  //   expect(response.body).toStrictEqual({
+  //     Error: "Key cnpj or email or username already exists",
+  //   });
+  // });
 
-  it("Return: Body error, updating duplicate cnpj | Status code: 409", async () => {
-    const newInformation = { ...generateCompany(), email: otherCompany.cnpj };
+  // it("Return: Body error, updating duplicate cnpj | Status code: 409", async () => {
+  //   const newInformation = { ...generateCompany(), email: otherCompany.cnpj };
 
-    const response = await supertest(app)
-      .patch(`/users/${company.id}`)
-      .set("Authorization", "Bearer " + tokenCompany)
-      .send({ ...newInformation });
+  //   const response = await supertest(app)
+  //     .patch(`/users/${company.id}`)
+  //     .set("Authorization", "Bearer " + tokenCompany)
+  //     .send({ ...newInformation });
 
-    expect(response.status).toBe(409);
-    expect(response.body).toStrictEqual({
-      Error: "Key cnpj or email or username already exists",
-    });
-  });
+  //   expect(response.status).toBe(409);
+  //   expect(response.body).toStrictEqual({
+  //     Error: "Key cnpj or email or username already exists",
+  //   });
+  // });
 
-  it("Return: Body error, updating duplicate username | Status code: 409", async () => {
-    const newInformation = {
-      ...generateCompany(),
-      email: otherCompany.username,
-    };
+  // it("Return: Body error, updating duplicate username | Status code: 409", async () => {
+  //   const newInformation = {
+  //     ...generateCompany(),
+  //     email: otherCompany.username,
+  //   };
 
-    const response = await supertest(app)
-      .patch(`/users/${company.id}`)
-      .set("Authorization", "Bearer " + tokenCompany)
-      .send({ ...newInformation });
+  //   const response = await supertest(app)
+  //     .patch(`/users/${company.id}`)
+  //     .set("Authorization", "Bearer " + tokenCompany)
+  //     .send({ ...newInformation });
 
-    expect(response.status).toBe(409);
-    expect(response.body).toStrictEqual({
-      Error: "Key cnpj or email or username already exists",
-    });
-  });
-});
-*/
+  //   expect(response.status).toBe(409);
+  //   expect(response.body).toStrictEqual({
+  //     Error: "Key cnpj or email or username already exists",
+  //   });
+  // });
+}); */
 
-/*
+
 describe("Delete company route | Integration Test", () => {
   let connection: DataSource;
 
@@ -622,6 +619,7 @@ describe("Delete company route | Integration Test", () => {
     );
     adm = await admRepo.save(adm);
     tokenAdm = generateToken(adm.id as string);
+    
 
     //add company
     const companyRepo = connection.getRepository(Company);
@@ -639,6 +637,7 @@ describe("Delete company route | Integration Test", () => {
   });
 
   it("Return: no body response | Status code: 204", async () => {
+
     const response = await supertest(app)
       .delete(`/companies/${company.id}`)
       .set("Authorization", "Bearer " + tokenCompany);
@@ -667,7 +666,7 @@ describe("Delete company route | Integration Test", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toStrictEqual({
-      Error: "Missing authorization token.",
+      Error: "Missing authorization token",
     });
   });
 
@@ -679,9 +678,7 @@ describe("Delete company route | Integration Test", () => {
       .set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(401);
-    expect(response.body).toStrictEqual({
-      Error: "Invalid Token",
-    });
+    expect(response.body.error.message).toStrictEqual("Invalid Token");
   });
 
   it("Return: Body error, no permision | Status code: 403", async () => {
@@ -706,4 +703,3 @@ describe("Delete company route | Integration Test", () => {
     });
   });
 });
-*/
