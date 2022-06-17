@@ -397,9 +397,6 @@ describe("Get companies route | Integration Test", () => {
   });
 }); 
 
-
-/*
-
 describe("Update company route | Integration Test", () => {
   let connection: DataSource;
 
@@ -489,7 +486,7 @@ describe("Update company route | Integration Test", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toStrictEqual({
-      Error: "Missing authorization token.",
+      Error: "Missing authorization token",
     });
   });
 
@@ -513,9 +510,7 @@ describe("Update company route | Integration Test", () => {
       .send({ ...generateCompany() });
 
     expect(response.status).toBe(401);
-    expect(response.body).toStrictEqual({
-      Error: "Invalid Token",
-    });
+    expect(response.body.error.message).toStrictEqual("Invalid Token");
   });
 
   it("Return: Body error, no permision | Status code: 403", async () => {
@@ -543,53 +538,53 @@ describe("Update company route | Integration Test", () => {
   });
 
   it("Return: Body error, updating duplicate email | Status code: 409", async () => {
-    const newInformation = { ...generateCompany(), email: otherCompany.email };
+
+    const newInformation = { ...generateCompany(), email: otherCompany.email};
 
     const response = await supertest(app)
-      .patch(`/users/${company.id}`)
+      .patch(`/companies/${company.id}`)
       .set("Authorization", "Bearer " + tokenCompany)
       .send({ ...newInformation });
 
     expect(response.status).toBe(409);
     expect(response.body).toStrictEqual({
-      Error: "Key cnpj or email or username already exists",
+      error: "Key cnpj or email or username already exists",
     });
   });
 
   it("Return: Body error, updating duplicate cnpj | Status code: 409", async () => {
-    const newInformation = { ...generateCompany(), email: otherCompany.cnpj };
+    const newInformation = { ...generateCompany(), cnpj: otherCompany.cnpj };
 
     const response = await supertest(app)
-      .patch(`/users/${company.id}`)
+      .patch(`/companies/${company.id}`)
       .set("Authorization", "Bearer " + tokenCompany)
       .send({ ...newInformation });
 
     expect(response.status).toBe(409);
     expect(response.body).toStrictEqual({
-      Error: "Key cnpj or email or username already exists",
+      error: "Key cnpj or email or username already exists",
     });
   });
 
   it("Return: Body error, updating duplicate username | Status code: 409", async () => {
     const newInformation = {
       ...generateCompany(),
-      email: otherCompany.username,
+      username: otherCompany.username,
     };
 
     const response = await supertest(app)
-      .patch(`/users/${company.id}`)
+      .patch(`/companies/${company.id}`)
       .set("Authorization", "Bearer " + tokenCompany)
       .send({ ...newInformation });
 
     expect(response.status).toBe(409);
     expect(response.body).toStrictEqual({
-      Error: "Key cnpj or email or username already exists",
+      error: "Key cnpj or email or username already exists",
     });
   });
 });
-*/
 
-/*
+
 describe("Delete company route | Integration Test", () => {
   let connection: DataSource;
 
@@ -622,6 +617,7 @@ describe("Delete company route | Integration Test", () => {
     );
     adm = await admRepo.save(adm);
     tokenAdm = generateToken(adm.id as string);
+    
 
     //add company
     const companyRepo = connection.getRepository(Company);
@@ -639,6 +635,7 @@ describe("Delete company route | Integration Test", () => {
   });
 
   it("Return: no body response | Status code: 204", async () => {
+
     const response = await supertest(app)
       .delete(`/companies/${company.id}`)
       .set("Authorization", "Bearer " + tokenCompany);
@@ -667,7 +664,7 @@ describe("Delete company route | Integration Test", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toStrictEqual({
-      Error: "Missing authorization token.",
+      Error: "Missing authorization token",
     });
   });
 
@@ -679,9 +676,7 @@ describe("Delete company route | Integration Test", () => {
       .set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(401);
-    expect(response.body).toStrictEqual({
-      Error: "Invalid Token",
-    });
+    expect(response.body.error.message).toStrictEqual("Invalid Token");
   });
 
   it("Return: Body error, no permision | Status code: 403", async () => {
@@ -706,4 +701,3 @@ describe("Delete company route | Integration Test", () => {
     });
   });
 });
-*/
