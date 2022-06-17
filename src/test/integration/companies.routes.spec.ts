@@ -397,7 +397,6 @@ describe("Get companies route | Integration Test", () => {
   });
 }); 
 
-/*
 describe("Update company route | Integration Test", () => {
   let connection: DataSource;
 
@@ -584,7 +583,7 @@ describe("Update company route | Integration Test", () => {
   //     Error: "Key cnpj or email or username already exists",
   //   });
   // });
-}); */
+});
 
 
 describe("Delete company route | Integration Test", () => {

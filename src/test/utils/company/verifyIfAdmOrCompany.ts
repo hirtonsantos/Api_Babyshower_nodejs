@@ -12,7 +12,7 @@ const verifyIfAdmOrCompany = async (id: string) => {
   
     const admAccountLogged = adms.find((adm) => adm.id === id);
     const companyAccountLogged = companies.find((company) => company.id === id)
-  
+ 
     if (!admAccountLogged && !companyAccountLogged) {
       throw new AppError(403, {
         "Error": "You can't access information of another company",
