@@ -390,7 +390,7 @@ describe("Get companies route | Integration Test", () => {
       .get(`/companies/${"idNotExistent"}`)
       .set("Authorization", "Bearer " + tokenCompany);
 
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(404);
     expect(response.body).toStrictEqual({
       Message: "Company not found",
     });

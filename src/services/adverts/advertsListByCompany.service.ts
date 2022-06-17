@@ -13,7 +13,12 @@ const advertsListByCompanyService = async (companyId: string) => {
 
     //find ads by company
     const adverts = await adsRepository.find()
-    const advertsByCompany = adverts.find(ad => ad.company === company)
+    const advertsByCompany = adverts.filter(ad => ad.company === company)
+    // console.log("companie=", companies)
+    // console.log("company=", company)
+    // console.log("adverts=", adverts)
+    // console.log("adverts by company=", advertsByCompany)
+
 
     return advertsByCompany
 }

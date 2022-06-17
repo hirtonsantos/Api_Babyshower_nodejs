@@ -5,7 +5,7 @@ export default {
     "**/**/**/companies.routes.spec.ts",
     "**/**/**/administrators.routes.spec.ts", //adicionado
     "**/**/**/chat.routes.spec.ts",
-    // "**/**/**/adverts.routes.spec.ts",
+    "**/**/**/adverts.routes.spec.ts",
   ],
   testEnvironment: "node",
 };

@@ -23,7 +23,7 @@ const verifyToken = async (
     const companyLogged = companies.find(company => company.id === req.decoded.id)
 
     if (!companies.find(company => company.id === id)){
-        throw new AppError(401, {Message: "Company not found"})
+        throw new AppError(404, {Message: "Company not found"})
     }
 
     if (admLogged){
