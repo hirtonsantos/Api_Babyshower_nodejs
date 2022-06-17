@@ -26,16 +26,14 @@ const administratorLoginService = async ({ validatedAdmin }: Request) => {
     throw new AppError(401, { Error: "User not authorized" });
   }
 
-  console.log(validatedAdmin.password);
-
   const token = jwt.sign(
-    { id: administrator.id },
+    { id: validatedAdmin?.id || administrator.id },
     String(process.env.SECRET_KEY),
     { expiresIn: process.env.EXPIRES_IN }
   );
 
   return {
-    id: administrator.id,
+    id: validatedAdmin?.id || administrator.id,
     access_token: token,
   };
 };
