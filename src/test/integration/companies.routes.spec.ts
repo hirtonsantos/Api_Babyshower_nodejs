@@ -462,127 +462,126 @@ describe("Update company route | Integration Test", () => {
     expect(updatedCompany).toEqual(expect.objectContaining({ ...newCompany }));
   });
 
-  // it("Return: No body response updating by ADM | Status code: 204", async () => {
-  //   const newInformation = generateCompany();
+  it("Return: No body response updating by ADM | Status code: 204", async () => {
+    const newInformation = generateCompany();
 
-  //   const response = await supertest(app)
-  //     .patch(`/companies/${company.id}`)
-  //     .set("Authorization", "Bearer " + tokenAdm)
-  //     .send({ ...newInformation });
+    const response = await supertest(app)
+      .patch(`/companies/${company.id}`)
+      .set("Authorization", "Bearer " + tokenAdm)
+      .send({ ...newInformation });
 
-  //   const { password, ...newCompany } = newInformation;
+    const { password, ...newCompany } = newInformation;
 
-  //   const companyRepo = connection.getRepository(Company);
-  //   const updatedCompany = await companyRepo.findOneBy({ id: company.id });
+    const companyRepo = connection.getRepository(Company);
+    const updatedCompany = await companyRepo.findOneBy({ id: company.id });
 
-  //   expect(response.status).toBe(204);
-  //   expect(updatedCompany).toEqual(expect.objectContaining({ ...newCompany }));
-  // });
+    expect(response.status).toBe(204);
+    expect(updatedCompany).toEqual(expect.objectContaining({ ...newCompany }));
+  });
 
-  // it("Return: Body error, missing token | Status code: 400", async () => {
-  //   const response = await supertest(app)
-  //     .patch(`/companies/${company.id}`)
-  //     .send({ ...generateCompany() });
+  it("Return: Body error, missing token | Status code: 400", async () => {
+    const response = await supertest(app)
+      .patch(`/companies/${company.id}`)
+      .send({ ...generateCompany() });
 
-  //   expect(response.status).toBe(400);
-  //   expect(response.body).toStrictEqual({
-  //     Error: "Missing authorization token.",
-  //   });
-  // });
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({
+      Error: "Missing authorization token",
+    });
+  });
 
-  // it("Return: Body error, invalid information | Status code: 400", async () => {
-  //   const newInformation = { email: "teste", cnpj: "1263" };
+  it("Return: Body error, invalid information | Status code: 400", async () => {
+    const newInformation = { email: "teste", cnpj: "1263" };
 
-  //   const response = await supertest(app)
-  //     .patch(`/companies/${company.id}`)
-  //     .set("Authorization", "Bearer " + tokenCompany)
-  //     .send({ ...newInformation });
+    const response = await supertest(app)
+      .patch(`/companies/${company.id}`)
+      .set("Authorization", "Bearer " + tokenCompany)
+      .send({ ...newInformation });
 
-  //   expect(response.status).toBe(400);
-  // });
+    expect(response.status).toBe(400);
+  });
 
-  // it("Return: Body error, invalid token | Status code: 401", async () => {
-  //   const token = "invalidToken";
+  it("Return: Body error, invalid token | Status code: 401", async () => {
+    const token = "invalidToken";
 
-  //   const response = await supertest(app)
-  //     .patch(`/companies/${company.id}`)
-  //     .set("Authorization", "Bearer " + token)
-  //     .send({ ...generateCompany() });
+    const response = await supertest(app)
+      .patch(`/companies/${company.id}`)
+      .set("Authorization", "Bearer " + token)
+      .send({ ...generateCompany() });
 
-  //   expect(response.status).toBe(401);
-  //   expect(response.body).toStrictEqual({
-  //     Error: "Invalid Token",
-  //   });
-  // });
+    expect(response.status).toBe(401);
+    expect(response.body.error.message).toStrictEqual("Invalid Token");
+  });
 
-  // it("Return: Body error, no permision | Status code: 403", async () => {
-  //   const response = await supertest(app)
-  //     .patch(`/companies/${otherCompany.id}`)
-  //     .set("Authorization", "Bearer " + tokenCompany)
-  //     .send({ ...generateCompany() });
+  it("Return: Body error, no permision | Status code: 403", async () => {
+    const response = await supertest(app)
+      .patch(`/companies/${otherCompany.id}`)
+      .set("Authorization", "Bearer " + tokenCompany)
+      .send({ ...generateCompany() });
 
-  //   expect(response.status).toBe(403);
-  //   expect(response.body).toStrictEqual({
-  //     Error: "You can't access information of another company",
-  //   });
-  // });
+    expect(response.status).toBe(403);
+    expect(response.body).toStrictEqual({
+      Error: "You can't access information of another company",
+    });
+  });
 
-  // it("Return: Body error, company not Found | Status code: 404", async () => {
-  //   const response = await supertest(app)
-  //     .patch(`/companies/${adm.id}`)
-  //     .set("Authorization", "Bearer " + tokenCompany)
-  //     .send({ ...generateCompany() });
+  it("Return: Body error, company not Found | Status code: 404", async () => {
+    const response = await supertest(app)
+      .patch(`/companies/${adm.id}`)
+      .set("Authorization", "Bearer " + tokenCompany)
+      .send({ ...generateCompany() });
 
-  //   expect(response.status).toBe(404);
-  //   expect(response.body).toStrictEqual({
-  //     Message: "Company not found",
-  //   });
-  // });
+    expect(response.status).toBe(404);
+    expect(response.body).toStrictEqual({
+      Message: "Company not found",
+    });
+  });
 
-  // it("Return: Body error, updating duplicate email | Status code: 409", async () => {
-  //   const newInformation = { ...generateCompany(), email: otherCompany.email };
+  it("Return: Body error, updating duplicate email | Status code: 409", async () => {
 
-  //   const response = await supertest(app)
-  //     .patch(`/users/${company.id}`)
-  //     .set("Authorization", "Bearer " + tokenCompany)
-  //     .send({ ...newInformation });
+    const newInformation = { ...generateCompany(), email: otherCompany.email};
 
-  //   expect(response.status).toBe(409);
-  //   expect(response.body).toStrictEqual({
-  //     Error: "Key cnpj or email or username already exists",
-  //   });
-  // });
+    const response = await supertest(app)
+      .patch(`/companies/${company.id}`)
+      .set("Authorization", "Bearer " + tokenCompany)
+      .send({ ...newInformation });
 
-  // it("Return: Body error, updating duplicate cnpj | Status code: 409", async () => {
-  //   const newInformation = { ...generateCompany(), email: otherCompany.cnpj };
+    expect(response.status).toBe(409);
+    expect(response.body).toStrictEqual({
+      error: "Key cnpj or email or username already exists",
+    });
+  });
 
-  //   const response = await supertest(app)
-  //     .patch(`/users/${company.id}`)
-  //     .set("Authorization", "Bearer " + tokenCompany)
-  //     .send({ ...newInformation });
+  it("Return: Body error, updating duplicate cnpj | Status code: 409", async () => {
+    const newInformation = { ...generateCompany(), cnpj: otherCompany.cnpj };
 
-  //   expect(response.status).toBe(409);
-  //   expect(response.body).toStrictEqual({
-  //     Error: "Key cnpj or email or username already exists",
-  //   });
-  // });
+    const response = await supertest(app)
+      .patch(`/companies/${company.id}`)
+      .set("Authorization", "Bearer " + tokenCompany)
+      .send({ ...newInformation });
 
-  // it("Return: Body error, updating duplicate username | Status code: 409", async () => {
-  //   const newInformation = {
-  //     ...generateCompany(),
-  //     email: otherCompany.username,
-  //   };
+    expect(response.status).toBe(409);
+    expect(response.body).toStrictEqual({
+      error: "Key cnpj or email or username already exists",
+    });
+  });
 
-  //   const response = await supertest(app)
-  //     .patch(`/users/${company.id}`)
-  //     .set("Authorization", "Bearer " + tokenCompany)
-  //     .send({ ...newInformation });
+  it("Return: Body error, updating duplicate username | Status code: 409", async () => {
+    const newInformation = {
+      ...generateCompany(),
+      username: otherCompany.username,
+    };
 
-  //   expect(response.status).toBe(409);
-  //   expect(response.body).toStrictEqual({
-  //     Error: "Key cnpj or email or username already exists",
-  //   });
-  // });
+    const response = await supertest(app)
+      .patch(`/companies/${company.id}`)
+      .set("Authorization", "Bearer " + tokenCompany)
+      .send({ ...newInformation });
+
+    expect(response.status).toBe(409);
+    expect(response.body).toStrictEqual({
+      error: "Key cnpj or email or username already exists",
+    });
+  });
 });
 
 
