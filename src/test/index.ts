@@ -56,8 +56,9 @@ const generateMessage = () => {
 const createMessageForData = (parentId: number) => {
   const parent_id = parentId;
   const createdAt = new Date();
+  const {message} = generateMessage()
 
-  return { ...generateMessage, parentId, createdAt };
+  return { message, parent_id, createdAt };
 };
 
 const generateToken = (id: string | number): string => {
