@@ -26,14 +26,11 @@ export const deleteImageService = async (key: string, idUser: string) => {
     if(process.env.STORAGE_TYPE === "s3"){
         const s3 = new AWS.S3()
 
-        console.log("s3 -> key", key)
-
         s3.deleteObject({
             Bucket: process.env.BUCKET_NAME as string,
             Key: key
         } as DeleteObjectRequest)
         .promise()
-        .then(res => console.log(res))
 
     } else {
         const filePath = path.resolve(__dirname,"..","..","..","tmp","uploads",key)
