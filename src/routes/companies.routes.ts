@@ -24,16 +24,19 @@ export const companiesRoutes = () => {
     verifyUniqueValuesMW,
     companyRegisterController
   );
-  routes.post("/login", validateSchema(loginUserSchema), companyLoginController);
-  routes.get("/", 
-    validateAdmToken, 
-    verifyIfAdm, 
-    companiesListController);
-  routes.get("/:id", 
-    validateAdmToken,
-    verifyToken,
-    companyListOneController);
-  routes.patch("/:id", companyUpdateController);
+  routes.post(
+    "/login",
+    validateSchema(loginUserSchema),
+    companyLoginController
+  );
+  routes.get("/", validateAdmToken, verifyIfAdm, companiesListController);
+  routes.get("/:id", validateAdmToken, verifyToken, companyListOneController);
+  routes.patch(
+    "/:id",
+    validateSchema(registerCompanySchema),
+    verifyUniqueValuesMW,
+    companyUpdateController
+  );
   routes.delete("/:id", companyDeleteController);
 
   return routes;
