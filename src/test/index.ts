@@ -30,7 +30,7 @@ const generateAdvert = () => {
   const arr: string[] = ["Premium", "Platinum", "Black"];
 
   const title = faker.random.words(6);
-  const apliedPrice = parseFloat(faker.commerce.price(100, 500));
+  const apliedPrice = parseFloat(faker.commerce.price(100));
   const description = faker.random.words(10);
   const linkAdverts = faker.internet.url();
   const image = faker.internet.url();
@@ -56,7 +56,7 @@ const generateMessage = () => {
 const createMessageForData = (parentId: number) => {
   const parent_id = parentId;
   const createdAt = new Date();
-  const {message} = generateMessage()
+  const { message } = generateMessage();
 
   return { message, parent_id, createdAt };
 };

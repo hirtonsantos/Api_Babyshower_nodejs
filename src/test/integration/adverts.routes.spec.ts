@@ -17,7 +17,7 @@ import { Company } from "../../entities/companies.entity";
 import { Administrator } from "../../entities/administrators.entity";
 import { CategoryAdvert } from "../../entities/categoryAdverts.entity";
 
-/* describe("Create advert route by company | Integration Test", () => {
+describe("Create advert route by company | Integration Test", () => {
   let connection: DataSource;
 
   let tokenAdm: string;
@@ -26,6 +26,9 @@ import { CategoryAdvert } from "../../entities/categoryAdverts.entity";
   let adm: Administrator;
   let company: Company;
   let otherCompany: Company;
+  let premium: CategoryAdvert;
+  let black: CategoryAdvert;
+  let platinum: CategoryAdvert;
 
   beforeAll(async () => {
     await AppDataSource.initialize()
@@ -60,6 +63,27 @@ import { CategoryAdvert } from "../../entities/categoryAdverts.entity";
     //add other company
     otherCompany = Object.assign(new Company(), newInstance(generateCompany()));
     otherCompany = await companyRepo.save(otherCompany);
+
+    // add categories
+    const catergoryRepo = connection.getRepository(CategoryAdvert);
+
+    premium = new CategoryAdvert();
+    premium.title = "Premium";
+    premium.price = 500;
+    premium.description = "Our most expensive plan.";
+    premium = await catergoryRepo.save(premium);
+
+    platinum = new CategoryAdvert();
+    platinum.title = "Platinum";
+    platinum.price = 350;
+    platinum.description = "Our medium price plan.";
+    platinum = await catergoryRepo.save(platinum);
+
+    black = new CategoryAdvert();
+    black.title = "Black";
+    black.price = 200;
+    black.description = "Our cheapest price plan.";
+    black = await catergoryRepo.save(black);
   });
 
   afterAll(async () => {
@@ -127,7 +151,7 @@ import { CategoryAdvert } from "../../entities/categoryAdverts.entity";
 
     expect(response.status).toBe(400);
     expect(response.body).toStrictEqual({
-      errors: ["password is a required field"],
+      errors: ["title is a required field", "description is a required field"],
     });
   });
 
@@ -165,10 +189,10 @@ import { CategoryAdvert } from "../../entities/categoryAdverts.entity";
 
     expect(response.status).toBe(404);
     expect(response.body).toStrictEqual({
-      Message: "Company not found",
+      Error: "Company not found",
     });
   });
-}); */
+});
 
 /* describe("Get adverts by company | Integration Test", () => {
   let connection: DataSource;
