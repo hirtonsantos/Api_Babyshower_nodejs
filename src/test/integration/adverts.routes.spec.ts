@@ -194,6 +194,19 @@ describe("Get adverts by company | Integration Test", () => {
         passwordHash: "passwordHash",
       };
     };
+    
+    //add categories
+    const categoryRepo = connection.getRepository(CategoryAdvert);
+    const categoariesTitles = ["Black", "Premium", "Platinum"]
+    for(let i = 0; i <=2; i ++){
+      let category = new CategoryAdvert()
+      category = Object.assign(category, {
+        "title": categoariesTitles[i],
+        "price": 100,
+        "description": "teste"
+      })
+      categoryRepo.save(category)
+    }
 
     //add admnistrator
     const admRepo = connection.getRepository(Administrator);
@@ -220,7 +233,6 @@ describe("Get adverts by company | Integration Test", () => {
 
     //insert 10 adverts for company
     const advertRepo = connection.getRepository(Advert);
-    const categoryRepo = connection.getRepository(CategoryAdvert);
     for (let i = 1; i <= 10; i++) {
       let payloadAdvert = generateAdvert();
       const category = await categoryRepo.findOneBy({

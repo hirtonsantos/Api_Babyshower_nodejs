@@ -13,15 +13,15 @@ const advertsListByCompanyController = async (req: Request, res: Response) => {
         
         let page = Number(req.query.page) 
         let perPage = Number(req.query.perPage)
-        let category = req.query.category 
+        let category = req.query.category?.toString() 
         
         //find category
         const categoryRepository = AppDataSource.getRepository(CategoryAdvert) 
         const categoryAds = await categoryRepository.find()
-        const categoryAdsName = categoryAds.find(c => c.title === category)
+        const categoryAdsEnt = categoryAds.find(
+            adCategory => adCategory.title.toLowerCase() === category?.toLowerCase()
+        )
 
-        // const pagination = paginationMiddleware(adverts)
-        
         if (!req.query.page){
             page = 1
         }
@@ -32,16 +32,12 @@ const advertsListByCompanyController = async (req: Request, res: Response) => {
         
         const initialElement: number = page * perPage - perPage
         
-        // if (categoryAdsName){
-        //     const adsBycategory = adverts.filter(ad => ad.category === categoryAdsName)
-        //     const pagePerategory = adsBycategory.splice(initialElement, perPage)
-        //     return res.status(200).send(pagePerategory)             
-        // }
-        // console.log("adverts=", adverts)
+        if (categoryAdsEnt){
+            const adsBycategory = adverts.filter(ad => ad.category.title === categoryAdsEnt.title)
+            return res.status(200).send(adsBycategory)             
+        }
         
         const pagination = adverts.splice(initialElement, perPage)
-        console.log(pagination)
-        console.log(pagination.map(ad => ad.category))
         
         return res.status(200).send(pagination)
         
