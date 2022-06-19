@@ -6,6 +6,7 @@ import advertUpdateController from "../controllers/adverts/advertUpdate.controll
 import validateAdmToken from "../middlewares/administrators/authAdm.middelware";
 import verifyAdsCompany from "../middlewares/adverts/verifyAdsCompany.middleware";
 import verifyToken from "../middlewares/companies/verifyToken.middleware";
+import verifyLoggedCompany from "../middlewares/adverts/verifyLoggedCompany.middleware";
 
 const routes = Router();
 
@@ -20,6 +21,7 @@ export const advertsRoutes = () => {
   routes.get("/:id", 
     validateAdmToken,
     // verifyAdsCompany,
+    verifyLoggedCompany,
     advertListOneController
   );
 
