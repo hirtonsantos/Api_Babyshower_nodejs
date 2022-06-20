@@ -597,7 +597,6 @@ describe("Get advert route | Integration Test", () => {
       .get(`/adverts/${advert.id}`)
       .set("Authorization", "Bearer " + tokenCompany);
     const { company, category, ...newAdvert } = advert;
-    console.log(response.body)
     expect(response.status).toBe(200);
     expect(response.body).not.toHaveProperty("passwordHash");
     expect(response.body).toEqual(
@@ -832,7 +831,7 @@ describe("Get advert route | Integration Test", () => {
   });
 }); */
 
-/* describe("Delete advert route | Integration Test", () => {
+describe("Delete advert route | Integration Test", () => {
   let connection: DataSource;
 
   let tokenAdm: string;
@@ -928,7 +927,7 @@ describe("Get advert route | Integration Test", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toStrictEqual({
-      Error: "Missing authorization token.",
+      Error: "Missing authorization token",
     });
   });
 
@@ -966,4 +965,4 @@ describe("Get advert route | Integration Test", () => {
       Message: "Advert not found",
     });
   });
-}); */
+}); 
