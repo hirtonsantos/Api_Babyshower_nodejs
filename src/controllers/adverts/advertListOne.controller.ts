@@ -7,7 +7,7 @@ const advertListOneController = async (req: Request, res: Response) => {
         const {id} = req.params
 
         const advert =  await advertListOneService(id)
-        console.log(advert)
+        console.log(advert?.id)
         
         return res.status(200).send(advert)
         

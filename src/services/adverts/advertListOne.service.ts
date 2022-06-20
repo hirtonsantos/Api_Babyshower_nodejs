@@ -1,5 +1,6 @@
 import { AppDataSource } from "../../data-source"
 import { Advert } from "../../entities/adverts.entity"
+import { Company } from "../../entities/companies.entity"
 
 const advertListOneService = async (advertId: string) => {
 

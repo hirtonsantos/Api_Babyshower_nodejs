@@ -565,7 +565,6 @@ describe("Get advert route | Integration Test", () => {
     const category = await categoryRepo.findOneBy({
       title: "Premium",
     });
-    console.log(category)
 
     advert = await advertRepo.save(
       Object.assign(new Advert(), {
@@ -585,6 +584,7 @@ describe("Get advert route | Integration Test", () => {
       .get(`/adverts/${advert.id}`)
       .set("Authorization", "Bearer " + tokenCompany);
     const { company, category, ...newAdvert } = advert;
+    console.log(response.body)
     expect(response.status).toBe(200);
     expect(response.body).not.toHaveProperty("passwordHash");
     expect(response.body).toEqual(
@@ -650,7 +650,7 @@ describe("Get advert route | Integration Test", () => {
 
     expect(response.status).toBe(404);
     expect(response.body).toStrictEqual({
-      Message: "Company not found",
+      Message: "Advert not found",
     });
   });
 });

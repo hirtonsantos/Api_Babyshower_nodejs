@@ -14,25 +14,32 @@ const verifyAdsCompany = async (
     const companiesRepository = AppDataSource.getRepository(Company) 
     const adsRepository = AppDataSource.getRepository(Advert) 
 
-    const id = req.decoded.id 
+    const loggedId = req.decoded.id 
+    const {id} = req.params 
 
     const ads = await adsRepository.find()
     const adms = await admRepository.find()
     const companies = await companiesRepository.find()
 
     const advert = ads.find(ad => ad.id === id)
-    const admLogged = adms.find(adm => adm.id === id)
-    const companyLogged = companies.find(company => company.id === id)
+    const admLogged = adms.find(adm => adm.id === loggedId)
+    const companyLogged = companies.find(company => company.id === loggedId)
 
-    if (!companies.find(company => company.id === advert?.company.id)){
-        throw new AppError(404, {Message: "Company not found"})
+    const companyAds = companyLogged?.adverts
+    const companyAdsId = companyAds?.map(ad => ad.id)
+    // console.log("advert=", advert)
+    // console.log("companyLogged=", companyAds?.map(ad => ad.id))
+    // console.log("if",advert?.company)
+
+    if (!ads.find(ad => ad.id === advert?.id)){
+        throw new AppError(404, {Message: "Advert not found"})
     }
 
     if (admLogged){
         return next()
     }
 
-    if (companyLogged?.id != id){
+    if (!companyAdsId?.includes(id)){
         throw new AppError(403, {Error: "You can't access information of another company"})
     }
 
