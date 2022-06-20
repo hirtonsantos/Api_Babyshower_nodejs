@@ -27,9 +27,6 @@ const verifyAdsCompany = async (
 
     const companyAds = companyLogged?.adverts
     const companyAdsId = companyAds?.map(ad => ad.id)
-    // console.log("advert=", advert)
-    // console.log("companyLogged=", companyAds?.map(ad => ad.id))
-    // console.log("if",advert?.company)
 
     if (!ads.find(ad => ad.id === advert?.id)){
         throw new AppError(404, {Message: "Advert not found"})

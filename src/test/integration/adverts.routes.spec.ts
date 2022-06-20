@@ -170,7 +170,7 @@ describe("Create advert route by company | Integration Test", () => {
   });
 }); */ 
 
-/*describe("Get adverts by company | Integration Test", () => {
+describe("Get adverts by company | Integration Test", () => {
   let connection: DataSource;
 
   let tokenAdm: string;
@@ -380,8 +380,8 @@ describe("Create advert route by company | Integration Test", () => {
       Message: "Company not found",
     });
   });
-}); */
-/*
+}); 
+
 describe("Get adverts | Integration Test", () => {
   let connection: DataSource;
 
@@ -402,10 +402,23 @@ describe("Get adverts | Integration Test", () => {
       };
     };
 
+    //add categories
+    const categoryRepo = connection.getRepository(CategoryAdvert);
+    const categoariesTitles = ["Black", "Premium", "Platinum"]
+    for(let i = 0; i <=2; i ++){
+      let category = new CategoryAdvert()
+      category = Object.assign(category, {
+        "title": categoariesTitles[i],
+        "price": 100,
+        "description": "teste"
+      })
+      categoryRepo.save(category)
+    }
+
     //insert 10 companies with 1 advert
     const companyRepo = connection.getRepository(Company);
     const advertRepo = connection.getRepository(Advert);
-    const categoryRepo = connection.getRepository(CategoryAdvert);
+    // const categoryRepo = connection.getRepository(CategoryAdvert);
     for (let i = 1; i <= 10; i++) {
       let company: Company = Object.assign(
         new Company(),
@@ -497,7 +510,7 @@ describe("Get adverts | Integration Test", () => {
     expect(response.body).toBeInstanceOf(Array);
     expect(response.body).toHaveLength(3);
   });
-}); */
+}); 
 
 describe("Get advert route | Integration Test", () => {
   let connection: DataSource;
