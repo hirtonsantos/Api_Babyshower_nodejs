@@ -1,0 +1,579 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Babyshower-Node",
+    "description": "Api secundária para recursos da plataforma Babyshower com sistema de cadastro para empresas e anúncios, banco de dados para o chat, sistema de cadastro para administradores de sistema e upload de imagem no serviço AWS.",
+    "version": "1.0.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000/api-documentation",
+      "description": "teste"
+    }
+  ],
+  "paths": {
+    "/companies/login": {
+      "post": {
+        "description": "Dá acesso a empresas para que possam cadastrar anúncios na plataforma",
+        "tags": ["Companies"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "aplication/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Login-email"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Login-username"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Login-cnpj"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Chaves faltando ou valores de tipos incorretos."
+          },
+          "401": {
+            "description": "Senha ou email invalidos",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidCredentialsError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/companies": {
+      "post": {
+        "summary": "Cadastra uma empresa",
+        "description": "Essa rota permite que a empresa se cadastre. Este cadastro pode ser realizado por um administrador do sistema da babyshower.",
+        "tags": ["Companies"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "aplication/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/NewCompany"
+                  },
+                  { "required": ["password"] },
+                  {
+                    "properties": {
+                      "password": {
+                        "type": "string",
+                        "example": "123456"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/NewCompany"
+                    },
+                    {
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "8556983d-938a-4354-b446-7ffe60f5e9af"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Chaves faltando ou valores de tipos incorretos."
+          },
+          "409": {
+            "description": "Email, cnpj ou usernames já estão cadastrados no sistema"
+          }
+        }
+      },
+      "get": {
+        "summary": "Retorna uma lista de empresas com informações de cadastro",
+        "description": "Esta rota permite o acesso por somente administradores do sistema da babyshower. É possível paginar os resultados.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Página da listagem solicitada.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": "1"
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Número de itens da página solicitada.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": "8"
+            }
+          }
+        ],
+        "security": [{ "bearerAuth": [] }],
+        "tags": ["Companies"],
+        "responses": {
+          "200": {
+            "description": "Lista de companies",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Company"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Tentativa de acesso sem token",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingTokenError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token informado é inválido ou usuário não é administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTokenError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/companies/{id}": {
+      "get": {
+        "summary": "Retorna uma empresa cadastrada",
+        "description": "Busca informações de uma empresa pelo seu id. Rota acessável também por um administrador de sistema da babyshower.",
+        "tags": ["Companies"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "id da empresa no formato uuid",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Company"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Tentativa de acesso sem token",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingTokenError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token informado é inválido ou usuário não é administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTokenError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Usuário tentando acessar informações de outro usuário sem ter poderes de administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoPermissionError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Atualiza os dados cadastrados de uma empresa.",
+        "description": "A empresa ou mesmo um administrador de sistema da babyshower pode fazer alterações nas informações cadastradas.",
+        "tags": ["Companies"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "id da empresa no formato uuid",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "aplication/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/NewCompany"
+                  },
+                  { "required": ["password"] },
+                  {
+                    "properties": {
+                      "password": {
+                        "type": "string",
+                        "example": "123456"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Tentativa de acesso sem token",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingTokenError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token informado é inválido ou usuário não é administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTokenError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Usuário tentando acessar informações de outro usuário sem ter poderes de administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoPermissionError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email, cnpj ou usernames já estão cadastrados no sistema"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Exclui uma empresa cadastrada",
+        "description": "A empresa ou um administrador do sistema da babyshower podem excluir o cadastro.",
+        "tags": ["Companies"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "id da empresa no formato uuid",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Tentativa de acesso sem token",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingTokenError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token informado é inválido ou usuário não é administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTokenError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Usuário tentando acessar informações de outro usuário sem ter poderes de administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoPermissionError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Login-email": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "atendimento@capivarisa.com",
+            "uniqueItems": true
+          },
+          "password": {
+            "type": "string",
+            "example": "123456"
+          }
+        }
+      },
+      "Login-cnpj": {
+        "type": "object",
+        "required": ["cnpj", "password"],
+        "properties": {
+          "cnpj": {
+            "type": "string",
+            "example": "000000000000015",
+            "uniqueItems": true
+          },
+          "password": {
+            "type": "string",
+            "example": "123456"
+          }
+        }
+      },
+      "Login-username": {
+        "type": "object",
+        "required": ["username", "password"],
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "capivaribusiness22",
+            "uniqueItems": true
+          },
+          "password": {
+            "type": "string",
+            "example": "123456"
+          }
+        }
+      },
+      "NewCompany": {
+        "type": "object",
+        "required": ["username", "email", "razaoSocial", "cnpj"],
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "capivarisa22",
+            "uniqueItems": true
+          },
+          "email": {
+            "type": "string",
+            "example": "atendimento@capivarisa.com",
+            "uniqueItems": true
+          },
+          "razaoSocial": {
+            "type": "string",
+            "example": "Capivari Sistemas Eletricos SA"
+          },
+          "cnpj": {
+            "type": "string",
+            "example": "00000000000009",
+            "uniqueItems": true
+          },
+          "phone": {
+            "type": "string",
+            "example": "48992586848"
+          }
+        }
+      },
+      "Token": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImIzOThjODJiLWUwMzMtNDJkMC1hMzhjLTVjYWE3ZThkNzk4OSIsImlhdCI6MTY1NDM0MzMyNiwiZXhwIjoxNjU0MzQ2OTI2fQ.FRl_xYRMkT992oOBp79Xae9B0fk4syRGBaH2T6xvicE"
+          }
+        }
+      },
+      "Company": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NewCompany"
+          },
+          {
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "8556983d-938a-4354-b446-7ffe60f5e9af"
+              },
+              "logoImage": {
+                "type": "string",
+                "example": "http://site.com.br/minha_image.jpg"
+              },
+              "adverts": {
+                "type": "string",
+                "example": "/adverts/byCompany/8556983d-938a-4354-b446-7ffe60f5e9af"
+              }
+            }
+          }
+        ]
+      },
+
+      "InvalidCredentialsError": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "example": "User not authorized"
+          }
+        }
+      },
+      "MissingTokenError": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "example": "Missing authorization token"
+          }
+        }
+      },
+      "InvalidTokenError": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "example": "Invalid token"
+          }
+        }
+      },
+      "NoPermissionError": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "example": "You can't access information of another company"
+          }
+        }
+      },
+      "NotFoundError": {
+        "type": "object",
+        "properties": {
+          "Message": {
+            "type": "string",
+            "example": "Company not found"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
