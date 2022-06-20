@@ -14,7 +14,7 @@
   "paths": {
     "/companies/login": {
       "post": {
-        "description": "Dá acesso a empresas para que possam cadastrar anúncios na plataforma",
+        "description": "Dá acesso às empresas para que possam cadastrar anúncios na plataforma",
         "tags": ["Companies"],
         "requestBody": {
           "required": true,
@@ -410,6 +410,146 @@
           }
         }
       }
+    },
+    "/administrators/login": {
+      "post": {
+        "description": "Dá acesso aos administradores do sistema da babyshower",
+        "tags": ["Administrators"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "aplication/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Login-email"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Login-username"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Token"
+                    },
+                    {
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "8556983d-938a-4354-b446-7ffe60f5e9af"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Chaves faltando ou valores de tipos incorretos."
+          },
+          "401": {
+            "description": "Senha ou email invalidos",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidCredentialsError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/administrators": {
+      "post": {
+        "summary": "Cadastra um admnistrator",
+        "description": "Essa rota permite que um administrador cadastre outro administrador, por isso deve utilizada por um administrador autenticado.",
+        "tags": ["Administrators"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "aplication/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/NewAdministrator"
+                  },
+                  { "required": ["password"] },
+                  {
+                    "properties": {
+                      "password": {
+                        "type": "string",
+                        "example": "123456"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/NewAdministrator"
+                    },
+                    {
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "8556983d-938a-4354-b446-7ffe60f5e9af"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Tentativa de acesso sem token",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingTokenError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token informado é inválido ou usuário não é administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTokenError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email, cnpj ou usernames já estão cadastrados no sistema"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -420,7 +560,7 @@
         "properties": {
           "email": {
             "type": "string",
-            "example": "atendimento@capivarisa.com",
+            "example": "email@mail.com",
             "uniqueItems": true
           },
           "password": {
@@ -450,7 +590,7 @@
         "properties": {
           "username": {
             "type": "string",
-            "example": "capivaribusiness22",
+            "example": "username22",
             "uniqueItems": true
           },
           "password": {
@@ -485,6 +625,22 @@
           "phone": {
             "type": "string",
             "example": "48992586848"
+          }
+        }
+      },
+      "NewAdministrator": {
+        "type": "object",
+        "required": ["username", "email"],
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "username22",
+            "uniqueItems": true
+          },
+          "email": {
+            "type": "string",
+            "example": "email@mail.com",
+            "uniqueItems": true
           }
         }
       },
