@@ -5,9 +5,9 @@ import { ICompanyLogin } from "../../interfaces/companies";
 
 const companyLoginController = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.validated as ICompanyLogin;
-
-    const access_token = await companyLoginService({ email, password });
+    const access_token = await companyLoginService(
+      req.validated as ICompanyLogin
+    );
 
     return res.status(200).json({ access_token });
   } catch (error) {

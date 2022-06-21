@@ -8,6 +8,7 @@ export interface IAdministratorLogin {
   email: string;
   username: string;
   password: string;
+  id?: number
 }
 
 export interface IAdministratorRegister {

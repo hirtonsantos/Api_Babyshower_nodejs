@@ -18,6 +18,7 @@ const loginAdminstratorSchema = yup.object().shape(
         then: yup.string().required(),
       }),
     password: yup.string().required(),
+    id: yup.number().positive().optional()
   },
   [
     ["username", "email"],
