@@ -4,6 +4,8 @@ import { ICompanyLogin } from "../../src/interfaces/companies/index";
 import { IAdministratorLogin } from "../../src/interfaces/administrators";
 import { IAdvertsReq } from "../../src/interfaces/adverts";
 import { Advert } from "../../src/entities/adverts.entity";
+import { IAdvert } from "../../src/interfaces/advert";
+import { IParent } from "../../src/interfaces/parent";
 
 declare global {
   namespace Express {
@@ -11,7 +13,7 @@ declare global {
       validated: Company | ICompanyLogin;
       validatedAdmin: IAdministratorLogin;
       validatedAdvert: Advert | IAdvertsReq;
-      decoded: Administrator;
+      decoded: Administrator | IParent;
       userId: string;
     }
   }

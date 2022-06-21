@@ -12,6 +12,8 @@ jobs:
     env:
       SECRET_KEY: teste
       EXPIRES_IN: 1h
+      STORAGE_TYPE: local
+      BUCKET_NAME: babyshower-upload
 
     steps:
       - name: Checkout repository

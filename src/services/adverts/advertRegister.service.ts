@@ -50,7 +50,7 @@ const advertRegisterService = async (
 
   ["company", "category"].forEach((e) => delete advertClone[e]);
 
-  advertClone["company"] = advert.id;
+  advertClone["company"] = advert.company.id;
   advertClone["category"] = category.title;
 
   return advertClone;
