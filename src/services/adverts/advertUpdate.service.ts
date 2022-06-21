@@ -6,10 +6,11 @@ const advertUpdateService = async (advertId: string, { validatedAdvert }: Reques
 
     const adsRepository = AppDataSource.getRepository(Advert) 
 
-    const advert = await adsRepository.findOneBy({id: advertId})
+    const advert = await adsRepository.findOneBy({id: advertId}) as Advert
+    
+    await adsRepository.update(advert!.id, {...validatedAdvert})
 
-    return advert
-
+    return true
 }
 
 export default advertUpdateService

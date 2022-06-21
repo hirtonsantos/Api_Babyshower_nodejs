@@ -6,5 +6,5 @@ export interface IAdvert {
     description: string;
     linkAdvert: string;
     image: string;
-    category: CategoryAdvert
+    category: CategoryAdvert;
   }
