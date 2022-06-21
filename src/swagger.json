@@ -187,6 +187,7 @@
         }
       }
     },
+
     "/companies/{id}": {
       "get": {
         "summary": "Retorna uma empresa cadastrada",
@@ -367,6 +368,153 @@
         "responses": {
           "204": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Tentativa de acesso sem token",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingTokenError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token informado é inválido ou usuário não é administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTokenError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Usuário tentando acessar informações de outro usuário sem ter poderes de administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoPermissionError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyNotFoundError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/adverts": {
+      "get": {
+        "summary": "Retorna uma lista de anúncios",
+        "description": "Esta rota traz uma lista de anúncios com dados não sensíveis que podem ser categorizados para utilização do front. Esta rota é paginada.",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Categoria a ser pesquisada.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["Premium", "Platinum", "Black"]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Página da listagem solicitada.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": "1"
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Número de itens da página solicitada.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": "8"
+            }
+          }
+        ],
+        "tags": ["Adverts"],
+        "responses": {
+          "200": {
+            "description": "Lista de adverts",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "8556983d-938a-4354-b446-7ffe60f5e9af"
+                      },
+                      "image": {
+                        "type": "string",
+                        "example": "http://site.com/image.gif"
+                      },
+                      "linkAdvert": {
+                        "type": "string",
+                        "example": "http://site.com/advert"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/adverts/byCompany/{id}": {
+      "post": {
+        "summary": "Cadastra um anúncio",
+        "description": "Essa rota permite que a empresa cadastre uma anúncio para utilizar na plataforma baby shower. Este cadastro pode ser realizado por um administrador do sistema da babyshower.",
+        "tags": ["Adverts"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "aplication/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/NewAdvert"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Advert"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Tentativa de acesso sem token",
