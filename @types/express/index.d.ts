@@ -9,7 +9,7 @@ declare global {
     interface Request {
       validated: Company | ICompanyLogin;
       validatedAdmin: IAdministratorLogin;
-      validatedAdvert: IAdvert
+      validatedAd: IAdvert
       decoded: Administrator;
       userId: string;
     }
