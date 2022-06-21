@@ -25,6 +25,10 @@ export const advertsRoutes = () => {
     advertListOneController
   );
   routes.get("/", advertsListController)
-
+  routes.delete("/:id", 
+    validateAdmToken,
+    verifyLoggedCompany,
+    advertDeleteController
+  )
   return routes;
 };
