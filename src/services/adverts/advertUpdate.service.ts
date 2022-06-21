@@ -1,29 +1,25 @@
-import { Request } from "express"
+import { Request, Response } from "express"
 import { AppDataSource } from "../../data-source"
 import { Advert } from "../../entities/adverts.entity"
 import { CategoryAdvert } from "../../entities/categoryAdverts.entity"
-import { AppError } from "../../errors/appError"
+import { AppError, handleError } from "../../errors/appError"
+import { IAdvert } from "../../interfaces/advert"
 
-const advertUpdateService = async (advertId: string, {validatedAd}: Request) => {  
+const advertUpdateService = async (advertId: string, updateAdvert: IAdvert, res: Response) => {  
 
     const adsRepository = AppDataSource.getRepository(Advert) 
 
     const categoryRepository = AppDataSource.getRepository(CategoryAdvert);
-    const categories = await categoryRepository.find();
+    const categories = await categoryRepository.find() as CategoryAdvert[]
 
-    const category = categories.find(
-        (category) => category.title.toLowerCase() === validatedAd.category?.toLocaleLowerCase()
-    );
-    
-    const advert = await adsRepository.findOneBy({id: advertId})
+    console.log("updateAdvert=", updateAdvert)
+    const category_ad = categories.find(
+        (category) => category.title.toLowerCase() === updateAdvert.category.toLowerCase()
+    )
 
-    const newAd = {
-        ...validatedAd
-    }
-    
-    
+    updateAdvert.category = category_ad as CategoryAdvert   
 
-    // await adsRepository.update(advertId, {...newAdsInfo})
+    await adsRepository.update(advertId, {...updateAdvert})
 
     return true
 }

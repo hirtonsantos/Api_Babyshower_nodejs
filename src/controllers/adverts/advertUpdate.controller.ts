@@ -6,7 +6,9 @@ const advertUpdateController = async (req: Request, res: Response) => {
     try {
         const {id} = req.params
 
-        await advertUpdateService(id, req.body)
+        const updateAd = req.body
+
+        await advertUpdateService(id, updateAd, res)
 
         return res.status(204).json()
         

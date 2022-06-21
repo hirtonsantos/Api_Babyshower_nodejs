@@ -4,7 +4,7 @@ export interface IAdvert {
     title?: string;
     apliedPrice?: number;
     description?: string;
-    linkAdvert?: string;
+    linkAdverts?: string;
     image?: string;
-    category?: string;
+    category?: any;
   }
