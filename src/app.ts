@@ -3,6 +3,8 @@ import "express-async-errors";
 import { appRoutes } from "./routes";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import cors from "cors"
+import path from "path";
+
 
 const app = express();
 
@@ -11,6 +13,11 @@ app.use(cors({
 }))
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(
+    "/files",
+    express.static(path.resolve(__dirname, "..", "tmp", "uploads"))
+  );
 appRoutes(app);
 
 app.use(errorMiddleware);
