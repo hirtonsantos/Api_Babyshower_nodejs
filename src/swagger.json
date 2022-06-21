@@ -251,7 +251,7 @@
             "content": {
               "aplication/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundError"
+                  "$ref": "#/components/schemas/CompanyNotFoundError"
                 }
               }
             }
@@ -337,7 +337,7 @@
             "content": {
               "aplication/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundError"
+                  "$ref": "#/components/schemas/CompanyNotFoundError"
                 }
               }
             }
@@ -403,7 +403,215 @@
             "content": {
               "aplication/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundError"
+                  "$ref": "#/components/schemas/CompanyNotFoundError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/adverts/{id}": {
+      "get": {
+        "summary": "Retorna um anúncio cadastrado.",
+        "description": "Acessa um anúncio específo. Possuem acesso a empresa criadora do anúncio e os administradores do sistema da babyshower.",
+        "tags": ["Adverts"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "id do anúncio no formato uuid",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Advert"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Tentativa de acesso sem token",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingTokenError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token informado é inválido ou usuário não é administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTokenError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Usuário tentando acessar informações de outro usuário sem ter poderes de administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoPermissionError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdvertNotFoundError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Atualiza os dados do anúncio.",
+        "description": "A empresa ou mesmo um administrador de sistema da babyshower pode fazer alterações nas informações cadastradas.",
+        "tags": ["Adverts"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "id do anúncio no formato uuid",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "aplication/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewAdvert"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Tentativa de acesso sem token",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingTokenError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token informado é inválido ou usuário não é administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTokenError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Usuário tentando acessar informações de outro usuário sem ter poderes de administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoPermissionError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdvertNotFoundError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Exclui um anúncio",
+        "description": "A empresa ou um administrador do sistema da babyshower podem excluir o cadastro.",
+        "tags": ["Adverts"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "id do anúncio no formato uuid",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Tentativa de acesso sem token",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingTokenError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token informado é inválido ou usuário não é administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTokenError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Usuário tentando acessar informações de outro usuário sem ter poderes de administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoPermissionError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdvertNotFoundError"
                 }
               }
             }
@@ -628,6 +836,36 @@
           }
         }
       },
+      "NewAdvert": {
+        "type": "object",
+        "required": ["title", "apliedPrice", "description", "category"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Campanha do dia dos pais"
+          },
+          "apliedPrice": {
+            "type": "number",
+            "example": 150.0
+          },
+          "description": {
+            "type": "string",
+            "example": "Capivari Sistemas Eletricos SA"
+          },
+          "category": {
+            "type": "string",
+            "example": "Premium"
+          },
+          "image": {
+            "type": "string",
+            "example": "http://site.com/image.gif"
+          },
+          "linkAdvert": {
+            "type": "string",
+            "example": "http://site.com/advert"
+          }
+        }
+      },
       "NewAdministrator": {
         "type": "object",
         "required": ["username", "email"],
@@ -656,7 +894,28 @@
       "Company": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/NewCompany"
+            "$ref": "#/components/schemas/NewAdvert"
+          },
+          {
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "8556983d-938a-4354-b446-7ffe60f5e9af"
+              },
+              "companyId": {
+                "type": "string",
+                "format": "uuid",
+                "example": "8556983d-938a-4354-b446-7ffe60f5e9af"
+              }
+            }
+          }
+        ]
+      },
+      "Advert": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NewAdvert"
           },
           {
             "properties": {
@@ -714,12 +973,21 @@
           }
         }
       },
-      "NotFoundError": {
+      "CompanyNotFoundError": {
         "type": "object",
         "properties": {
           "Message": {
             "type": "string",
             "example": "Company not found"
+          }
+        }
+      },
+      "AdvertNotFoundError": {
+        "type": "object",
+        "properties": {
+          "Message": {
+            "type": "string",
+            "example": "Advert not found"
           }
         }
       }
