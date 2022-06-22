@@ -9,16 +9,17 @@ const advertUpdateController = async (req: Request, res: Response) => {
 
         const updateAd = req.body
 
-        if (typeof updateAd.apliedPrice !== "number") {
-            return res.status(400).json()
+        if (updateAd.apliedPrice){
+            if (typeof updateAd.apliedPrice !== "number") {
+                return res.status(400).json({"Error": "ApliedPrice must be a number"})
+            }
         }
 
-        const adKeys = Object.keys(updateAd).sort()
-        adKeys.shift()
+        const adKeys = Object.keys(updateAd)
 
         for(let i = 0; i < adKeys.length; i++){
-            if (typeof updateAd[adKeys[i]] !== "string"){
-                return res.status(400).json()
+            if (typeof updateAd[adKeys[i]] !== "string" && adKeys[i] !== "apliedPrice"){
+                return res.status(400).json({"Error": "Your values must be a string"})
             }
         }
 

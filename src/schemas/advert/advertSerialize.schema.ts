@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
 const registerAdvertSchema = yup.object().shape({
-  title: yup.string().required(),
+  title: yup.string().notRequired(),
   description: yup.string().notRequired(),
   linkAdverts: yup.string().notRequired(),
   image: yup.string().notRequired(),
@@ -9,8 +9,7 @@ const registerAdvertSchema = yup.object().shape({
     .string()
     .notRequired()
     .transform((value) => value.toLowerCase()),
-  apliedPrice: yup.number().required(),
+  apliedPrice: yup.number().notRequired(),
 });
 
 export default registerAdvertSchema;
-  
