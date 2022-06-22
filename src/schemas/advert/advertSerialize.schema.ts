@@ -1,23 +1,16 @@
 import * as yup from "yup";
 
-export const advertUpdateSchema = yup.object().shape(
-  {
-    title: yup.string().notRequired(),
-    apliedPrice: yup.string().notRequired(),
-    description: yup.string().notRequired(),
-    linkAdverts: yup.string().notRequired(),
-    image: yup.string().notRequired(),
-    category: yup.string().notRequired(),
-  },
-);
+const registerAdvertSchema = yup.object().shape({
+  title: yup.string().required(),
+  description: yup.string().notRequired(),
+  linkAdverts: yup.string().notRequired(),
+  image: yup.string().notRequired(),
+  category: yup
+    .string()
+    .notRequired()
+    .transform((value) => value.toLowerCase()),
+  apliedPrice: yup.number().required(),
+});
 
-const serializedUpdateAdvertSchema = yup.object().shape({
-    title: yup.string().notRequired(),
-    apliedPrice: yup.number().notRequired(),
-    linkAdverts: yup.string().notRequired(),
-    image: yup.string().notRequired(),
-    category: yup.string().notRequired(),
-  });
-  
-export default serializedUpdateAdvertSchema;
+export default registerAdvertSchema;
   
