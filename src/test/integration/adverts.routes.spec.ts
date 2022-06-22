@@ -16,7 +16,7 @@ import { AppDataSource } from "../../data-source";
 import { Company } from "../../entities/companies.entity";
 import { Administrator } from "../../entities/administrators.entity";
 import { CategoryAdvert } from "../../entities/categoryAdverts.entity";
-/*
+
 describe("Create advert route by company | Integration Test", () => {
   let connection: DataSource;
 
@@ -26,6 +26,9 @@ describe("Create advert route by company | Integration Test", () => {
   let adm: Administrator;
   let company: Company;
   let otherCompany: Company;
+  let premium: CategoryAdvert;
+  let black: CategoryAdvert;
+  let platinum: CategoryAdvert;
 
   beforeAll(async () => {
     await AppDataSource.initialize()
@@ -60,6 +63,27 @@ describe("Create advert route by company | Integration Test", () => {
     //add other company
     otherCompany = Object.assign(new Company(), newInstance(generateCompany()));
     otherCompany = await companyRepo.save(otherCompany);
+
+    // add categories
+    const catergoryRepo = connection.getRepository(CategoryAdvert);
+
+    premium = new CategoryAdvert();
+    premium.title = "Premium";
+    premium.price = 500;
+    premium.description = "Our most expensive plan.";
+    premium = await catergoryRepo.save(premium);
+
+    platinum = new CategoryAdvert();
+    platinum.title = "Platinum";
+    platinum.price = 350;
+    platinum.description = "Our medium price plan.";
+    platinum = await catergoryRepo.save(platinum);
+
+    black = new CategoryAdvert();
+    black.title = "Black";
+    black.price = 200;
+    black.description = "Our cheapest price plan.";
+    black = await catergoryRepo.save(black);
   });
 
   afterAll(async () => {
@@ -127,7 +151,7 @@ describe("Create advert route by company | Integration Test", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toStrictEqual({
-      errors: ["password is a required field"],
+      errors: ["title is a required field", "description is a required field"],
     });
   });
 
@@ -165,507 +189,507 @@ describe("Create advert route by company | Integration Test", () => {
 
     expect(response.status).toBe(404);
     expect(response.body).toStrictEqual({
+      Error: "Company not found",
+    });
+  });
+});
+
+describe("Get adverts by company | Integration Test", () => {
+  let connection: DataSource;
+
+  let tokenAdm: string;
+  let tokenCompany: string;
+  let tokenOtherCompany: string;
+  let adverts: Advert[] = [];
+  let company: Company;
+  let adm: Administrator;
+
+  beforeAll(async () => {
+    await AppDataSource.initialize()
+      .then((res) => (connection = res))
+      .catch((err) => {
+        console.error("Error during Data Source initialization", err);
+      });
+
+    const newInstance = (generate: ICompany | IAdministrator): any => {
+      const { password, ...newPayload } = generate;
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    };
+    
+    //add categories
+    const categoryRepo = connection.getRepository(CategoryAdvert);
+    const categoariesTitles = ["Black", "Premium", "Platinum"]
+    for(let i = 0; i <=2; i ++){
+      let category = new CategoryAdvert()
+      category = Object.assign(category, {
+        "title": categoariesTitles[i],
+        "price": 100,
+        "description": "teste"
+      })
+      categoryRepo.save(category)
+    }
+
+    //add admnistrator
+    const admRepo = connection.getRepository(Administrator);
+    adm = Object.assign(
+      new Administrator(),
+      newInstance(generateAdministrator())
+    );
+    adm = await admRepo.save(adm);
+    tokenAdm = generateToken(adm.id as string);
+
+    //add company
+    const companyRepo = connection.getRepository(Company);
+    company = Object.assign(new Company(), newInstance(generateCompany()));
+    company = await companyRepo.save(company);
+    tokenCompany = generateToken(company.id as string);
+
+    //add other company
+    let otherCompany = Object.assign(
+      new Company(),
+      newInstance(generateCompany())
+    );
+    otherCompany = await companyRepo.save(otherCompany);
+    tokenOtherCompany = generateToken(otherCompany.id as string);
+
+    //insert 10 adverts for company
+    const advertRepo = connection.getRepository(Advert);
+    for (let i = 1; i <= 10; i++) {
+      let payloadAdvert = generateAdvert();
+      const category = await categoryRepo.findOneBy({
+        title: i <= 5 ? "Premium" : i <= 7 ? "Platinum" : "Black",
+      });
+
+      const advert = await advertRepo.save(
+        Object.assign(new Advert(), {
+          ...payloadAdvert,
+          company: company,
+          category: category,
+        })
+      );
+      adverts.push(advert);
+    }
+  });
+
+  afterAll(async () => {
+    await connection.destroy();
+  });
+
+  it("Return: Adverts as JSON response | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/byCompany/${company.id}`)
+      .set("Authorization", "Bearer " + tokenCompany);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(8);
+    // expect(response.body[0]).toEqual(expect.objectContaining(adverts[0]));
+  });
+
+  it("Return: Adverts as JSON response ADM | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/byCompany/${company.id}`)
+      .set("Authorization", "Bearer " + tokenAdm);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(8);
+  });
+
+  it("Return: Companies as JSON response page 2 | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/byCompany/${company.id}?page=2`)
+      .set("Authorization", "Bearer " + tokenCompany);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(2);
+  });
+
+  it("Return: Companies as JSON response perPage 4 | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/byCompany/${company.id}?perPage=4`)
+      .set("Authorization", "Bearer " + tokenCompany);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(4);
+  });
+
+  it("Return: Companies as JSON response page 3 perPage 4 | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/byCompany/${company.id}?page=3&perPage=4`)
+      .set("Authorization", "Bearer " + tokenCompany);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(2);
+  });
+
+  it("Return: Companies as JSON response category Premium | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/byCompany/${company.id}?category=Premium`)
+      .set("Authorization", "Bearer " + tokenCompany);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(5);
+  });
+
+  it("Return: Companies as JSON response category platinum | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/byCompany/${company.id}?category=platinum`)
+      .set("Authorization", "Bearer " + tokenCompany);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(2);
+  });
+
+  it("Return: Companies as JSON response category blACk | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/byCompany/${company.id}?category=bLACk`)
+      .set("Authorization", "Bearer " + tokenCompany);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(3);
+  });
+
+  it("Return: Body error, missing token | Status code: 400", async () => {
+    const response = await supertest(app).get(
+      `/adverts/byCompany/${company.id}`
+    );
+
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({
+      Error: "Missing authorization token",
+    });
+  });
+
+  it("Return: Body error, invalid token | Status code: 401", async () => {
+    const token = "invalidToken";
+
+    const response = await supertest(app)
+      .get(`/adverts/byCompany/${company.id}`)
+      .set("Authorization", "Bearer " + token);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
+  });
+
+  it("Return: Body error, no permission | Status code: 403", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/byCompany/${company.id}`)
+      .set("Authorization", "Bearer " + tokenOtherCompany);
+
+    expect(response.status).toBe(403);
+    expect(response.body).toStrictEqual({
+      Error: "You can't access information of another company",
+    });
+  });
+
+  it("Return: Body error, company not found | Status code: 404", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/byCompany/${adm.id}`)
+      .set("Authorization", "Bearer " + tokenCompany);
+
+    expect(response.status).toBe(404);
+    expect(response.body).toStrictEqual({
       Message: "Company not found",
     });
   });
-}); */ 
+}); 
 
-// describe("Get adverts by company | Integration Test", () => {
-//   let connection: DataSource;
+describe("Get adverts | Integration Test", () => {
+  let connection: DataSource;
 
-//   let tokenAdm: string;
-//   let tokenCompany: string;
-//   let tokenOtherCompany: string;
-//   let adverts: Advert[] = [];
-//   let company: Company;
-//   let adm: Administrator;
+  let adverts: Advert[] = [];
 
-//   beforeAll(async () => {
-//     await AppDataSource.initialize()
-//       .then((res) => (connection = res))
-//       .catch((err) => {
-//         console.error("Error during Data Source initialization", err);
-//       });
+  beforeAll(async () => {
+    await AppDataSource.initialize()
+      .then((res) => (connection = res))
+      .catch((err) => {
+        console.error("Error during Data Source initialization", err);
+      });
 
-//     const newInstance = (generate: ICompany | IAdministrator): any => {
-//       const { password, ...newPayload } = generate;
-//       return {
-//         ...newPayload,
-//         passwordHash: "passwordHash",
-//       };
-//     };
+    const newInstance = (generate: ICompany | IAdministrator): any => {
+      const { password, ...newPayload } = generate;
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    };
+
+    //add categories
+    const categoryRepo = connection.getRepository(CategoryAdvert);
+    const categoariesTitles = ["Black", "Premium", "Platinum"]
+    for(let i = 0; i <=2; i ++){
+      let category = new CategoryAdvert()
+      category = Object.assign(category, {
+        "title": categoariesTitles[i],
+        "price": 100,
+        "description": "teste"
+      })
+      categoryRepo.save(category)
+    }
+
+    //insert 10 companies with 1 advert
+    const companyRepo = connection.getRepository(Company);
+    const advertRepo = connection.getRepository(Advert);
+    // const categoryRepo = connection.getRepository(CategoryAdvert);
+    for (let i = 1; i <= 10; i++) {
+      let company: Company = Object.assign(
+        new Company(),
+        newInstance(generateCompany())
+      );
+      company = await companyRepo.save(company);
+
+      let payloadAdvert = generateAdvert();
+      const category = await categoryRepo.findOneBy({
+        title: i <= 5 ? "Premium" : i <= 7 ? "Platinum" : "Black",
+      });
+
+      const advert = await advertRepo.save(
+        Object.assign(new Advert(), {
+          ...payloadAdvert,
+          company: company,
+          category: category,
+        })
+      );
+      adverts.push(advert);
+    }
+  });
+
+  afterAll(async () => {
+    await connection.destroy();
+  });
+
+  it("Return: Adverts as JSON response | Status code: 200", async () => {
+    const response = await supertest(app).get("/adverts");
+
+    const { id, linkAdverts, image } = adverts[0];
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(8);
+    expect(response.body[0]).toEqual(
+      expect.objectContaining({
+        id,
+        linkAdverts,
+        image,
+      })
+    );
+  });
+
+  it("Return: Companies as JSON response page 2 | Status code: 200", async () => {
+    const response = await supertest(app).get("/adverts?page=2");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(2);
+  });
+
+  it("Return: Companies as JSON response perPage 4 | Status code: 200", async () => {
+    const response = await supertest(app).get("/adverts?perPage=4");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(4);
+  });
+
+  it("Return: Companies as JSON response page 3 perPage 4 | Status code: 200", async () => {
+    const response = await supertest(app).get("/adverts?page=3&perPage=4");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(2);
+  });
+
+  it("Return: Companies as JSON response category Premium | Status code: 200", async () => {
+    const response = await supertest(app).get("/adverts?category=Premium");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(5);
+  });
+
+  it("Return: Companies as JSON response category platinum | Status code: 200", async () => {
+    const response = await supertest(app).get("/adverts?category=platinum");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(2);
+  });
+
+  it("Return: Companies as JSON response category blACk | Status code: 200", async () => {
+    const response = await supertest(app).get("/adverts?category=blACk");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toHaveLength(3);
+  });
+}); 
+
+describe("Get advert route | Integration Test", () => {
+  let connection: DataSource;
+
+  let tokenCompany: string;
+  let tokenAdm: string;
+  let tokenOtherCompany: string;
+  let advert: Advert;
+
+  beforeAll(async () => {
+    await AppDataSource.initialize()
+      .then((res) => (connection = res))
+      .catch((err) => {
+        console.error("Error during Data Source initialization", err);
+      });
+
+    const newInstance = (generate: ICompany | IAdministrator): any => {
+      const { password, ...newPayload } = generate;
+      return {
+        ...newPayload,
+        passwordHash: "passwordHash",
+      };
+    };
+
+    //add admnistrator
+    const admRepo = connection.getRepository(Administrator);
+    let adm: Administrator = Object.assign(
+      new Administrator(),
+      newInstance(generateAdministrator())
+    );
+    adm = await admRepo.save(adm);
+    tokenAdm = generateToken(adm.id as string);
+
+    //insert logged company
+    const companyRepo = connection.getRepository(Company);
+    let company = Object.assign(new Company(), newInstance(generateCompany()));
+    company = await companyRepo.save(company);
+    tokenCompany = generateToken(company.id as string);
+
+    //insert otherCompany
+    let otherCompany = Object.assign(
+      new Company(),
+      newInstance(generateCompany())
+    );
+    otherCompany = await companyRepo.save(otherCompany);
+    tokenOtherCompany = generateToken(otherCompany.id as string);
     
-//     //add categories
-//     const categoryRepo = connection.getRepository(CategoryAdvert);
-//     const categoariesTitles = ["Black", "Premium", "Platinum"]
-//     for(let i = 0; i <=2; i ++){
-//       let category = new CategoryAdvert()
-//       category = Object.assign(category, {
-//         "title": categoariesTitles[i],
-//         "price": 100,
-//         "description": "teste"
-//       })
-//       categoryRepo.save(category)
-//     }
-
-//     //add admnistrator
-//     const admRepo = connection.getRepository(Administrator);
-//     adm = Object.assign(
-//       new Administrator(),
-//       newInstance(generateAdministrator())
-//     );
-//     adm = await admRepo.save(adm);
-//     tokenAdm = generateToken(adm.id as string);
-
-//     //add company
-//     const companyRepo = connection.getRepository(Company);
-//     company = Object.assign(new Company(), newInstance(generateCompany()));
-//     company = await companyRepo.save(company);
-//     tokenCompany = generateToken(company.id as string);
-
-//     //add other company
-//     let otherCompany = Object.assign(
-//       new Company(),
-//       newInstance(generateCompany())
-//     );
-//     otherCompany = await companyRepo.save(otherCompany);
-//     tokenOtherCompany = generateToken(otherCompany.id as string);
-
-//     //insert 10 adverts for company
-//     const advertRepo = connection.getRepository(Advert);
-//     for (let i = 1; i <= 10; i++) {
-//       let payloadAdvert = generateAdvert();
-//       const category = await categoryRepo.findOneBy({
-//         title: i <= 5 ? "Premium" : i <= 7 ? "Platinum" : "Black",
-//       });
-
-//       const advert = await advertRepo.save(
-//         Object.assign(new Advert(), {
-//           ...payloadAdvert,
-//           company: company,
-//           category: category,
-//         })
-//       );
-//       adverts.push(advert);
-//     }
-//   });
-
-//   afterAll(async () => {
-//     await connection.destroy();
-//   });
-
-//   it("Return: Adverts as JSON response | Status code: 200", async () => {
-//     const response = await supertest(app)
-//       .get(`/adverts/byCompany/${company.id}`)
-//       .set("Authorization", "Bearer " + tokenCompany);
-
-//     expect(response.status).toBe(200);
-//     expect(response.body).toBeInstanceOf(Array);
-//     expect(response.body).toHaveLength(8);
-//     // expect(response.body[0]).toEqual(expect.objectContaining(adverts[0]));
-//   });
-
-//   it("Return: Adverts as JSON response ADM | Status code: 200", async () => {
-//     const response = await supertest(app)
-//       .get(`/adverts/byCompany/${company.id}`)
-//       .set("Authorization", "Bearer " + tokenAdm);
-
-//     expect(response.status).toBe(200);
-//     expect(response.body).toBeInstanceOf(Array);
-//     expect(response.body).toHaveLength(8);
-//   });
-
-//   it("Return: Companies as JSON response page 2 | Status code: 200", async () => {
-//     const response = await supertest(app)
-//       .get(`/adverts/byCompany/${company.id}?page=2`)
-//       .set("Authorization", "Bearer " + tokenCompany);
-
-//     expect(response.status).toBe(200);
-//     expect(response.body).toBeInstanceOf(Array);
-//     expect(response.body).toHaveLength(2);
-//   });
-
-//   it("Return: Companies as JSON response perPage 4 | Status code: 200", async () => {
-//     const response = await supertest(app)
-//       .get(`/adverts/byCompany/${company.id}?perPage=4`)
-//       .set("Authorization", "Bearer " + tokenCompany);
-
-//     expect(response.status).toBe(200);
-//     expect(response.body).toBeInstanceOf(Array);
-//     expect(response.body).toHaveLength(4);
-//   });
-
-//   it("Return: Companies as JSON response page 3 perPage 4 | Status code: 200", async () => {
-//     const response = await supertest(app)
-//       .get(`/adverts/byCompany/${company.id}?page=3&perPage=4`)
-//       .set("Authorization", "Bearer " + tokenCompany);
-
-//     expect(response.status).toBe(200);
-//     expect(response.body).toBeInstanceOf(Array);
-//     expect(response.body).toHaveLength(2);
-//   });
-
-//   it("Return: Companies as JSON response category Premium | Status code: 200", async () => {
-//     const response = await supertest(app)
-//       .get(`/adverts/byCompany/${company.id}?category=Premium`)
-//       .set("Authorization", "Bearer " + tokenCompany);
-
-//     expect(response.status).toBe(200);
-//     expect(response.body).toBeInstanceOf(Array);
-//     expect(response.body).toHaveLength(5);
-//   });
-
-//   it("Return: Companies as JSON response category platinum | Status code: 200", async () => {
-//     const response = await supertest(app)
-//       .get(`/adverts/byCompany/${company.id}?category=platinum`)
-//       .set("Authorization", "Bearer " + tokenCompany);
-
-//     expect(response.status).toBe(200);
-//     expect(response.body).toBeInstanceOf(Array);
-//     expect(response.body).toHaveLength(2);
-//   });
-
-//   it("Return: Companies as JSON response category blACk | Status code: 200", async () => {
-//     const response = await supertest(app)
-//       .get(`/adverts/byCompany/${company.id}?category=bLACk`)
-//       .set("Authorization", "Bearer " + tokenCompany);
-
-//     expect(response.status).toBe(200);
-//     expect(response.body).toBeInstanceOf(Array);
-//     expect(response.body).toHaveLength(3);
-//   });
-
-//   it("Return: Body error, missing token | Status code: 400", async () => {
-//     const response = await supertest(app).get(
-//       `/adverts/byCompany/${company.id}`
-//     );
-
-//     expect(response.status).toBe(400);
-//     expect(response.body).toStrictEqual({
-//       Error: "Missing authorization token",
-//     });
-//   });
-
-//   it("Return: Body error, invalid token | Status code: 401", async () => {
-//     const token = "invalidToken";
-
-//     const response = await supertest(app)
-//       .get(`/adverts/byCompany/${company.id}`)
-//       .set("Authorization", "Bearer " + token);
-
-//     expect(response.status).toBe(401);
-//     expect(response.body).toStrictEqual({
-//       Error: "Invalid Token",
-//     });
-//   });
-
-//   it("Return: Body error, no permission | Status code: 403", async () => {
-//     const response = await supertest(app)
-//       .get(`/adverts/byCompany/${company.id}`)
-//       .set("Authorization", "Bearer " + tokenOtherCompany);
-
-//     expect(response.status).toBe(403);
-//     expect(response.body).toStrictEqual({
-//       Error: "You can't access information of another company",
-//     });
-//   });
-
-//   it("Return: Body error, company not found | Status code: 404", async () => {
-//     const response = await supertest(app)
-//       .get(`/adverts/byCompany/${adm.id}`)
-//       .set("Authorization", "Bearer " + tokenCompany);
-
-//     expect(response.status).toBe(404);
-//     expect(response.body).toStrictEqual({
-//       Message: "Company not found",
-//     });
-//   });
-// }); 
-
-// describe("Get adverts | Integration Test", () => {
-//   let connection: DataSource;
-
-//   let adverts: Advert[] = [];
-
-//   beforeAll(async () => {
-//     await AppDataSource.initialize()
-//       .then((res) => (connection = res))
-//       .catch((err) => {
-//         console.error("Error during Data Source initialization", err);
-//       });
-
-//     const newInstance = (generate: ICompany | IAdministrator): any => {
-//       const { password, ...newPayload } = generate;
-//       return {
-//         ...newPayload,
-//         passwordHash: "passwordHash",
-//       };
-//     };
-
-//     //add categories
-//     const categoryRepo = connection.getRepository(CategoryAdvert);
-//     const categoariesTitles = ["Black", "Premium", "Platinum"]
-//     for(let i = 0; i <=2; i ++){
-//       let category = new CategoryAdvert()
-//       category = Object.assign(category, {
-//         "title": categoariesTitles[i],
-//         "price": 100,
-//         "description": "teste"
-//       })
-//       categoryRepo.save(category)
-//     }
-
-//     //insert 10 companies with 1 advert
-//     const companyRepo = connection.getRepository(Company);
-//     const advertRepo = connection.getRepository(Advert);
-//     // const categoryRepo = connection.getRepository(CategoryAdvert);
-//     for (let i = 1; i <= 10; i++) {
-//       let company: Company = Object.assign(
-//         new Company(),
-//         newInstance(generateCompany())
-//       );
-//       company = await companyRepo.save(company);
-
-//       let payloadAdvert = generateAdvert();
-//       const category = await categoryRepo.findOneBy({
-//         title: i <= 5 ? "Premium" : i <= 7 ? "Platinum" : "Black",
-//       });
-
-//       const advert = await advertRepo.save(
-//         Object.assign(new Advert(), {
-//           ...payloadAdvert,
-//           company: company,
-//           category: category,
-//         })
-//       );
-//       adverts.push(advert);
-//     }
-//   });
-
-//   afterAll(async () => {
-//     await connection.destroy();
-//   });
-
-//   it("Return: Adverts as JSON response | Status code: 200", async () => {
-//     const response = await supertest(app).get("/adverts");
-
-//     const { id, linkAdverts, image } = adverts[0];
-
-//     expect(response.status).toBe(200);
-//     expect(response.body).toBeInstanceOf(Array);
-//     expect(response.body).toHaveLength(8);
-//     expect(response.body[0]).toEqual(
-//       expect.objectContaining({
-//         id,
-//         linkAdverts,
-//         image,
-//       })
-//     );
-//   });
-
-//   it("Return: Companies as JSON response page 2 | Status code: 200", async () => {
-//     const response = await supertest(app).get("/adverts?page=2");
-
-//     expect(response.status).toBe(200);
-//     expect(response.body).toBeInstanceOf(Array);
-//     expect(response.body).toHaveLength(2);
-//   });
-
-//   it("Return: Companies as JSON response perPage 4 | Status code: 200", async () => {
-//     const response = await supertest(app).get("/adverts?perPage=4");
-
-//     expect(response.status).toBe(200);
-//     expect(response.body).toBeInstanceOf(Array);
-//     expect(response.body).toHaveLength(4);
-//   });
-
-//   it("Return: Companies as JSON response page 3 perPage 4 | Status code: 200", async () => {
-//     const response = await supertest(app).get("/adverts?page=3&perPage=4");
-
-//     expect(response.status).toBe(200);
-//     expect(response.body).toBeInstanceOf(Array);
-//     expect(response.body).toHaveLength(2);
-//   });
-
-//   it("Return: Companies as JSON response category Premium | Status code: 200", async () => {
-//     const response = await supertest(app).get("/adverts?category=Premium");
-
-//     expect(response.status).toBe(200);
-//     expect(response.body).toBeInstanceOf(Array);
-//     expect(response.body).toHaveLength(5);
-//   });
-
-//   it("Return: Companies as JSON response category platinum | Status code: 200", async () => {
-//     const response = await supertest(app).get("/adverts?category=platinum");
-
-//     expect(response.status).toBe(200);
-//     expect(response.body).toBeInstanceOf(Array);
-//     expect(response.body).toHaveLength(2);
-//   });
-
-//   it("Return: Companies as JSON response category blACk | Status code: 200", async () => {
-//     const response = await supertest(app).get("/adverts?category=blACk");
-
-//     expect(response.status).toBe(200);
-//     expect(response.body).toBeInstanceOf(Array);
-//     expect(response.body).toHaveLength(3);
-//   });
-// }); 
-
-// describe("Get advert route | Integration Test", () => {
-//   let connection: DataSource;
-
-//   let tokenCompany: string;
-//   let tokenAdm: string;
-//   let tokenOtherCompany: string;
-//   let advert: Advert;
-
-//   beforeAll(async () => {
-//     await AppDataSource.initialize()
-//       .then((res) => (connection = res))
-//       .catch((err) => {
-//         console.error("Error during Data Source initialization", err);
-//       });
-
-//     const newInstance = (generate: ICompany | IAdministrator): any => {
-//       const { password, ...newPayload } = generate;
-//       return {
-//         ...newPayload,
-//         passwordHash: "passwordHash",
-//       };
-//     };
-
-//     //add admnistrator
-//     const admRepo = connection.getRepository(Administrator);
-//     let adm: Administrator = Object.assign(
-//       new Administrator(),
-//       newInstance(generateAdministrator())
-//     );
-//     adm = await admRepo.save(adm);
-//     tokenAdm = generateToken(adm.id as string);
-
-//     //insert logged company
-//     const companyRepo = connection.getRepository(Company);
-//     let company = Object.assign(new Company(), newInstance(generateCompany()));
-//     company = await companyRepo.save(company);
-//     tokenCompany = generateToken(company.id as string);
-
-//     //insert otherCompany
-//     let otherCompany = Object.assign(
-//       new Company(),
-//       newInstance(generateCompany())
-//     );
-//     otherCompany = await companyRepo.save(otherCompany);
-//     tokenOtherCompany = generateToken(otherCompany.id as string);
-    
-//     //add categories
-//     const categoryRepo = connection.getRepository(CategoryAdvert);
-//     const categoariesTitles = ["Black", "Premium", "Platinum"]
-//     for(let i = 0; i <=2; i++){
-//       let catego = new CategoryAdvert()
-//       catego = Object.assign(catego, {
-//         "title": categoariesTitles[i],
-//         "price": 100,
-//         "description": "teste"
-//       })
-//       categoryRepo.save(catego)
-//     }
-
-//     //insert newAdvert for company
-//     const advertRepo = connection.getRepository(Advert);
-//     //const categoryRepo = connection.getRepository(CategoryAdvert);
-//     const payloadAdvert = generateAdvert();
-//     const category = await categoryRepo.findOneBy({
-//       title: "Premium",
-//     });
-
-//     advert = await advertRepo.save(
-//       Object.assign(new Advert(), {
-//         ...payloadAdvert,
-//         company: company,
-//         category: category,
-//       })
-//     );
-//   });
-
-//   afterAll(async () => {
-//     await connection.destroy();
-//   });
-
-//   it("Return: Advert as JSON response | Status code: 200", async () => {
-//     const response = await supertest(app)
-//       .get(`/adverts/${advert.id}`)
-//       .set("Authorization", "Bearer " + tokenCompany);
-//     const { company, category, ...newAdvert } = advert;
-//     expect(response.status).toBe(200);
-//     expect(response.body).not.toHaveProperty("passwordHash");
-//     expect(response.body).toEqual(
-//       expect.objectContaining({
-//         ...newAdvert,
-//         // category: category.title,
-//       })
-//     );
-//   });
-
-//   it("Return: Advert as JSON response | Status code: 200", async () => {
-//     const response = await supertest(app)
-//       .get(`/adverts/${advert.id}`)
-//       .set("Authorization", "Bearer " + tokenAdm);
-//     const { company, category, ...newAdvert } = advert;
-//     expect(response.status).toBe(200);
-//     expect(response.body).not.toHaveProperty("passwordHash");
-//     expect(response.body).toEqual(
-//       expect.objectContaining({
-//         ...newAdvert,
-//         // companyId: company.id,
-//         // category: category.title,
-//       })
-//     );
-//   });
-
-//   it("Return: Body error, missing token | Status code: 400", async () => {
-//     const response = await supertest(app).get(`/adverts/${advert.id}`);
-//     expect(response.status).toBe(400);
-//     expect(response.body).toStrictEqual({
-//       Error: "Missing authorization token",
-//     });
-//   });
-
-//   it("Return: Body error, invalid token | Status code: 401", async () => {
-//     const token = "invalidToken";
-
-//     const response = await supertest(app)
-//       .get(`/adverts/${advert.id}`)
-//       .set("Authorization", "Bearer " + token);
-
-//     expect(response.status).toBe(401);
-//     expect(response.body).toStrictEqual({
-//       Error: "Invalid Token",
-//     });
-//   });
-
-//   it("Return: Body error, no permision | Status code: 403", async () => {
-//     const response = await supertest(app)
-//       .get(`/adverts/${advert.id}`)
-//       .set("Authorization", "Bearer " + tokenOtherCompany);
-
-//     expect(response.status).toBe(403);
-//     expect(response.body).toStrictEqual({
-//       Error: "You can't access information of another company",
-//     });
-//   });
-
-//   it("Return: Body error, not Found | Status code: 404", async () => {
-//     const response = await supertest(app)
-//       .get(`/adverts/${"idNotExistent"}`)
-//       .set("Authorization", "Bearer " + tokenCompany);
-
-//     expect(response.status).toBe(404);
-//     expect(response.body).toStrictEqual({
-//       Message: "Advert not found",
-//     });
-//   });
-// });
+    //add categories
+    const categoryRepo = connection.getRepository(CategoryAdvert);
+    const categoariesTitles = ["Black", "Premium", "Platinum"]
+    for(let i = 0; i <=2; i++){
+      let catego = new CategoryAdvert()
+      catego = Object.assign(catego, {
+        "title": categoariesTitles[i],
+        "price": 100,
+        "description": "teste"
+      })
+      categoryRepo.save(catego)
+    }
+
+    //insert newAdvert for company
+    const advertRepo = connection.getRepository(Advert);
+    //const categoryRepo = connection.getRepository(CategoryAdvert);
+    const payloadAdvert = generateAdvert();
+    const category = await categoryRepo.findOneBy({
+      title: "Premium",
+    });
+
+    advert = await advertRepo.save(
+      Object.assign(new Advert(), {
+        ...payloadAdvert,
+        company: company,
+        category: category,
+      })
+    );
+  });
+
+  afterAll(async () => {
+    await connection.destroy();
+  });
+
+  it("Return: Advert as JSON response | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + tokenCompany);
+    const { company, category, ...newAdvert } = advert;
+    expect(response.status).toBe(200);
+    expect(response.body).not.toHaveProperty("passwordHash");
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        ...newAdvert,
+        // category: category.title,
+      })
+    );
+  });
+
+  it("Return: Advert as JSON response | Status code: 200", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + tokenAdm);
+    const { company, category, ...newAdvert } = advert;
+    expect(response.status).toBe(200);
+    expect(response.body).not.toHaveProperty("passwordHash");
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        ...newAdvert,
+        // companyId: company.id,
+        // category: category.title,
+      })
+    );
+  });
+
+  it("Return: Body error, missing token | Status code: 400", async () => {
+    const response = await supertest(app).get(`/adverts/${advert.id}`);
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({
+      Error: "Missing authorization token",
+    });
+  });
+
+  it("Return: Body error, invalid token | Status code: 401", async () => {
+    const token = "invalidToken";
+
+    const response = await supertest(app)
+      .get(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + token);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
+  });
+
+  it("Return: Body error, no permision | Status code: 403", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/${advert.id}`)
+      .set("Authorization", "Bearer " + tokenOtherCompany);
+
+    expect(response.status).toBe(403);
+    expect(response.body).toStrictEqual({
+      Error: "You can't access information of another company",
+    });
+  });
+
+  it("Return: Body error, not Found | Status code: 404", async () => {
+    const response = await supertest(app)
+      .get(`/adverts/${"idNotExistent"}`)
+      .set("Authorization", "Bearer " + tokenCompany);
+
+    expect(response.status).toBe(404);
+    expect(response.body).toStrictEqual({
+      Message: "Advert not found",
+    });
+  });
+});
 
 describe("Update advert route | Integration Test", () => {
   let connection: DataSource;
@@ -750,7 +774,6 @@ describe("Update advert route | Integration Test", () => {
 
   it("Return: No body response | Status code: 204", async () => {
     const newInformation = generateAdvert();
-    console.log(newInformation)
 
     const response = await supertest(app)
       .patch(`/adverts/${advert.id}`)
@@ -761,7 +784,6 @@ describe("Update advert route | Integration Test", () => {
 
     const advertRepo = connection.getRepository(Advert);
     const updatedAdvert = await advertRepo.findOneBy({ id: advert.id });
-    console.log(response.body)
     expect(response.status).toBe(204);
     expect(updatedAdvert?.category.title).toStrictEqual(category);
     expect(updatedAdvert).toEqual(expect.objectContaining({ ...newPayload }));
