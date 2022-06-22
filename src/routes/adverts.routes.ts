@@ -1,5 +1,10 @@
 import { Router } from "express";
+
+import validateAdministratorMW from "../middlewares/adverts/validateAdministrator.middleware";
+import validateSchemaAdvertMW from "../middlewares/adverts/validateSchemaAdvert.middleware";
+
 import advertDeleteController from "../controllers/adverts/advertDelete.controller";
+import advertRegisterController from "../controllers/adverts/advertRegister.controller";
 import advertListOneController from "../controllers/adverts/advertListOne.controller";
 import advertsListByCompanyController from "../controllers/adverts/advertsListByCompany.controller";
 import advertUpdateController from "../controllers/adverts/advertUpdate.controller";
@@ -9,9 +14,17 @@ import verifyToken from "../middlewares/companies/verifyToken.middleware";
 import verifyLoggedCompany from "../middlewares/adverts/verifyLoggedCompany.middleware";
 import advertsListController from "../controllers/adverts/advertList.controller";
 
+import registerAdvertSchema from "../schemas/adverts/registerAdvert.schema";
+
 const routes = Router();
 
 export const advertsRoutes = () => {
+  routes.post(
+    "/byCompany/:id",
+    validateSchemaAdvertMW(registerAdvertSchema),
+    validateAdministratorMW,
+    advertRegisterController
+  );
   routes.patch("/", advertUpdateController);
   routes.delete("/", advertDeleteController);
   routes.get("/byCompany/:id", 
