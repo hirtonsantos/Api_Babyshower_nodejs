@@ -1,10 +1,15 @@
 import "reflect-metadata";
 import path from "path";
 import { DataSource } from "typeorm";
+import fs from 'fs'
 
 import * as dotenv from "dotenv";
 
 dotenv.config();
+
+if (!fs.existsSync("tmp/uploads")){
+    fs.mkdirSync("tmp/uploads", {recursive: true});
+}
 
 export const AppDataSource =
   process.env.NODE_ENV === "test"

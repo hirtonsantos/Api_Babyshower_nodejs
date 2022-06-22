@@ -158,8 +158,6 @@ describe("Login administrator route | Integration Test", () => {
       .post("/administrators/login")
       .send({ email, password });
 
-    console.log(response.error);
-
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("id");
     expect(response.body).toHaveProperty("access_token");
