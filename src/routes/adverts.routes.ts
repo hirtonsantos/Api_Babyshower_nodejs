@@ -9,7 +9,7 @@ import verifyToken from "../middlewares/companies/verifyToken.middleware";
 import verifyLoggedCompany from "../middlewares/adverts/verifyLoggedCompany.middleware";
 import advertsListController from "../controllers/adverts/advertList.controller";
 import validateSchema from "../middlewares/validateSchema.middleware";
-import registerAdvertSchema from "../schemas/advert/advertSerialize.schema";
+import updateAdvertSchema from "../schemas/advert/advertSerialize.schema";
 import validateSchemaAdvert from "../middlewares/adverts/validateSchemaAdvert.middleware";
 
 const routes = Router();
@@ -34,7 +34,7 @@ export const advertsRoutes = () => {
   routes.patch("/:id", 
   validateAdmToken,
   verifyLoggedCompany,
-  validateSchemaAdvert(registerAdvertSchema),
+  validateSchemaAdvert(updateAdvertSchema),
   advertUpdateController)
 
   return routes;

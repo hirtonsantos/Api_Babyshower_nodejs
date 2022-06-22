@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-const registerAdvertSchema = yup.object().shape({
+const updateAdvertSchema = yup.object().shape({
   title: yup.string().notRequired(),
   description: yup.string().notRequired(),
   linkAdverts: yup.string().notRequired(),
@@ -12,4 +12,4 @@ const registerAdvertSchema = yup.object().shape({
   apliedPrice: yup.number().notRequired(),
 });
 
-export default registerAdvertSchema;
+export default updateAdvertSchema;
