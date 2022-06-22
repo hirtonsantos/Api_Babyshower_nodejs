@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import validateSchemaAdm from "../middlewares/administrators/validateSchemaAdm.middleware";
-import loginAdminstratorSchema from "../schemas/administrator/loginAdministrator.schema";
+import loginAdminstratorSchema from "../schemas/administrators/loginAdministrator.schema";
 
 import administratorDeleteService from "../controllers/administrators/administratorsDeleteSelf.controller";
 import administratorsListController from "../controllers/administrators/administratorsList.controller";
@@ -19,12 +19,14 @@ import { registerAdminSchema } from "../schemas/administrators/renameAdmin.schem
 const routes = Router();
 
 export const administratorRoutes = () => {
-  routes.post("/",
+  routes.post(
+    "/",
     validateAdmToken,
-    verifyIfAdm, 
+    verifyIfAdm,
     validateSchema(registerAdminSchema),
     verifyUniqueValuesAdmin,
-    administratorRegisterController);
+    administratorRegisterController
+  );
   routes.get("/", administratorsListController);
   routes.get("/:id", administratorUserController);
   routes.post(
