@@ -306,6 +306,8 @@ describe("Get chats that parent is included | Integration Test", () => {
       .get(`/chat?page=2`)
       .set("Authorization", "Bearer " + token);
 
+      console.log(response.body)
+
     expect(response.status).toBe(200);
     expect(response.body.chats).toBeInstanceOf(Array);
     expect(response.body.chats).toHaveLength(8);
