@@ -13,6 +13,9 @@ import verifyAdsCompany from "../middlewares/adverts/verifyAdsCompany.middleware
 import verifyToken from "../middlewares/companies/verifyToken.middleware";
 import verifyLoggedCompany from "../middlewares/adverts/verifyLoggedCompany.middleware";
 import advertsListController from "../controllers/adverts/advertList.controller";
+import validateSchema from "../middlewares/validateSchema.middleware";
+import updateAdvertSchema from "../schemas/advert/advertSerialize.schema";
+import validateSchemaAdvertUpdate from "../middlewares/adverts/validateSchemaUpdate.middleware";
 
 import registerAdvertSchema from "../schemas/adverts/registerAdvert.schema";
 
@@ -42,6 +45,12 @@ export const advertsRoutes = () => {
     validateAdmToken,
     verifyLoggedCompany,
     advertDeleteController
-  )
+  );
+  routes.patch("/:id", 
+  validateAdmToken,
+  verifyLoggedCompany,
+  validateSchemaAdvertUpdate(updateAdvertSchema),
+  advertUpdateController)
+
   return routes;
 };

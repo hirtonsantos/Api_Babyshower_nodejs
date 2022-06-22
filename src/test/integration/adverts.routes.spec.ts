@@ -691,7 +691,7 @@ describe("Get advert route | Integration Test", () => {
   });
 });
 
-/* describe("Update advert route | Integration Test", () => {
+describe("Update advert route | Integration Test", () => {
   let connection: DataSource;
 
   let tokenAdm: string;
@@ -713,6 +713,19 @@ describe("Get advert route | Integration Test", () => {
         passwordHash: "passwordHash",
       };
     };
+
+    //add categories
+    const categoryRepo = connection.getRepository(CategoryAdvert);
+    const categoariesTitles = ["Black", "Premium", "Platinum"]
+    for(let i = 0; i <=2; i ++){
+      let category = new CategoryAdvert()
+      category = Object.assign(category, {
+        "title": categoariesTitles[i],
+        "price": 100,
+        "description": "teste"
+      })
+      categoryRepo.save(category)
+    }
 
     //add admnistrator
     const admRepo = connection.getRepository(Administrator);
@@ -739,19 +752,20 @@ describe("Get advert route | Integration Test", () => {
 
     //add advert for company
     const advertRepo = connection.getRepository(Advert);
-    const categoryRepo = connection.getRepository(CategoryAdvert);
+    // const categoryRepo = connection.getRepository(CategoryAdvert);
     const payloadAdvert = generateAdvert();
     const category = await categoryRepo.findOneBy({
       title: "Premium",
     });
-
+    
     advert = await advertRepo.save(
       Object.assign(new Advert(), {
         ...payloadAdvert,
         company: company,
         category: category,
       })
-    );
+      );
+      // console.log(advert)
   });
 
   afterAll(async () => {
@@ -770,7 +784,6 @@ describe("Get advert route | Integration Test", () => {
 
     const advertRepo = connection.getRepository(Advert);
     const updatedAdvert = await advertRepo.findOneBy({ id: advert.id });
-
     expect(response.status).toBe(204);
     expect(updatedAdvert?.category.title).toStrictEqual(category);
     expect(updatedAdvert).toEqual(expect.objectContaining({ ...newPayload }));
@@ -801,7 +814,7 @@ describe("Get advert route | Integration Test", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toStrictEqual({
-      Error: "Missing authorization token.",
+      Error: "Missing authorization token",
     });
   });
 
@@ -853,7 +866,7 @@ describe("Get advert route | Integration Test", () => {
       Message: "Advert not found",
     });
   });
-}); */
+});
 
 describe("Delete advert route | Integration Test", () => {
   let connection: DataSource;

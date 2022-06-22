@@ -12,6 +12,7 @@ declare global {
     interface Request {
       validated: Company | ICompanyLogin;
       validatedAdmin: IAdministratorLogin;
+      validatedAd: IAdvert;
       validatedAdvert: Advert | IAdvertsReq;
       decoded: Administrator | IParent;
       userId: string;
