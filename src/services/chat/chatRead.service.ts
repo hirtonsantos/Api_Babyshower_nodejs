@@ -3,12 +3,7 @@ import { Chat } from "../../entities/chat.entity";
 import { Message } from "../../entities/messages.entity";
 import { AppError } from "../../errors/appError";
 
-const chatReadService = async (
-  chat_id: string,
-  user_id: number,
-  page: number,
-  perPage: number
-) => {
+const chatReadService = async (chat_id: string, user_id: number) => {
   const chatRepository = AppDataSource.getRepository(Chat);
   const msgRepository = AppDataSource.getRepository(Message);
 
@@ -46,21 +41,8 @@ const chatReadService = async (
     });
   }
 
-  if (page * perPage > chatCurrent.messages.length) {
-    return {
-      messages: chatCurrent.messages,
-    };
-  }
-
-  let messagesChat = [];
-  const from = (page - 1) * perPage;
-  const to = from + perPage;
-  for (let i = from; i < to; i++) {
-    messagesChat.push(chatCurrent.messages[i]);
-  }
-
   return {
-    messages: messagesChat,
+    messages: chatCurrent.messages,
   };
 };
 
