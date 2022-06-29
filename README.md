@@ -35,4 +35,4 @@ Repositório da api complementar em Node.js:[Api_Babyshower_nodejs](https://gith
 
 Link da documentação desta api: [Swagger](https://babyshower-api-node.herokuapp.com/api-documentation)
 
-***Documentação das rotas de chat e upload de imagens da AWS ainda estão em desenvolvimento.
+***Documentação das rotas de chat em desenvolvimento.
