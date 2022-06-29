@@ -2,7 +2,7 @@ import { Express } from "express";
 import { administratorRoutes } from "./administrators.routes";
 import { advertsRoutes } from "./adverts.routes";
 import { companiesRoutes } from "./companies.routes";
-import { chatRoutes } from "./chat.route";
+import { chatRoutes } from "./chat.routes";
 import { uploadRoutes } from "./upload.routes";
 
 export const appRoutes = (app: Express) => {

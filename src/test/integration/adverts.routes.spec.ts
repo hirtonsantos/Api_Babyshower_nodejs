@@ -765,7 +765,6 @@ describe("Update advert route | Integration Test", () => {
         category: category,
       })
       );
-      // console.log(advert)
   });
 
   afterAll(async () => {
