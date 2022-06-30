@@ -33,12 +33,13 @@ export const companiesRoutes = () => {
   routes.get("/:id", validateAdmToken, verifyToken, companyListOneController);
   routes.patch(
     "/:id",
+    validateAdmToken,
     validateSchema(registerCompanySchema),
     verifyUniqueValuesMW,
     verifyToken,
     companyUpdateController
   );
-  routes.delete("/:id", verifyToken, companyDeleteController);
+  routes.delete("/:id", validateAdmToken, verifyToken, companyDeleteController);
 
   return routes;
 };

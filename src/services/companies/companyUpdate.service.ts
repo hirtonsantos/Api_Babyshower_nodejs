@@ -4,13 +4,15 @@ import { Company } from "../../entities/companies.entity";
 import { AppError } from "../../errors/appError";
 import verifyIfAdmOrCompany from "../../test/utils/company/verifyIfAdmOrCompany";
 
-const companyUpdateService = async (id: string, idToken: string, { validated }: Request) => {
-    
-    await verifyIfAdmOrCompany(idToken);
-    
-    const companyRepository = AppDataSource.getRepository(Company)
+const companyUpdateService = async (
+  id: string,
+  /* idToken: string, */ { validated }: Request
+) => {
+  /* await verifyIfAdmOrCompany(idToken); */
 
-    const tokenIdIsCompany: any = await companyRepository.findOne({
+  const companyRepository = AppDataSource.getRepository(Company);
+
+  /* const tokenIdIsCompany: any = await companyRepository.findOne({
         where: {
         id: idToken,
         },
@@ -33,12 +35,12 @@ const companyUpdateService = async (id: string, idToken: string, { validated }: 
             throw new AppError(403, {
                 Error: "You can't access information of another company",
             });
-        }
+        } */
 
-        await companyRepository.update(id, { ...validated })
+  await companyRepository.update(id, { ...validated });
 
-        return true
-    }
+  /* return true */
+  /*  }
 
     if (!companyCurrent) {
         throw new AppError(404, { Message: "Company not found" });
@@ -46,7 +48,7 @@ const companyUpdateService = async (id: string, idToken: string, { validated }: 
 
     await companyRepository.update(id, { ...validated })
 
-    return true;
+    return true; */
 };
 
 export default companyUpdateService;
