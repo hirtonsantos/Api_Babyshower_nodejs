@@ -3,64 +3,33 @@ import { Chat } from "../../entities/chat.entity";
 import { Message } from "../../entities/messages.entity";
 import { AppError } from "../../errors/appError";
 
-const chatReadService = async (
-  chat_id: string,
-  user_id: any,
-  page: number,
-  perPage: number
-) => {
+const chatReadService = async (chat_id: string, user_id: any) => {
   const chatRepository = AppDataSource.getRepository(Chat);
   const msgRepository = AppDataSource.getRepository(Message);
 
-  let chat = await chatRepository.find({
-    where: {
-      id: chat_id,
-    },
+  let chat = await chatRepository.findOneBy({
+    id: chat_id,
   });
 
-  if (!chat.length) {
+  if (!chat) {
     throw new AppError(404, { Message: "Chat not found" });
   }
 
-  const chatCurrent = chat[0];
-
-  chatCurrent?.messages.map(async (msg) => {
-    if (
-      msg.parent_id !== user_id &&
-      chatCurrent.other_parent_user === user_id
-    ) {
-      const msg_item = await msgRepository.findOneBy({
-        id: msg.id,
-      });
-      msgRepository.update(msg_item!.id, { read_message: true });
-    }
-    return true;
-  });
-
-  if (
-    chatCurrent.parent_user != user_id ||
-    chatCurrent.parent_user != user_id
-  ) {
+  if (chat.parent_user != user_id && chat.other_parent_user != user_id) {
     throw new AppError(403, {
       Error: "You can't access information of another user",
     });
   }
 
-  if (page * perPage > chatCurrent.messages.length) {
-    return {
-      messages: chatCurrent.messages,
-    };
-  }
-
-  let messagesChat = [];
-  const from = (page - 1) * perPage;
-  const to = from + perPage;
-  for (let i = from; i < to; i++) {
-    messagesChat.push(chatCurrent.messages[i]);
-  }
+  chat?.messages.map(async (msg) => {
+    if (msg.parent_id !== user_id && !msg.read_message) {
+      msg.read_message = true;
+      await msgRepository.update(msg.id, { read_message: true });
+    }
+  });
 
   return {
-    messages: messagesChat,
+    messages: chat.messages,
   };
 };
 

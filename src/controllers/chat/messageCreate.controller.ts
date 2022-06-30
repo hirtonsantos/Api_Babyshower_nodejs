@@ -7,8 +7,6 @@ const createMessageController = async (req: Request, res: Response) => {
   const data = req.body;
   let user_id = Number(req.decoded.id);
 
-  let token = req.headers.authorization?.replace("Bearer", "").trim()!;
-
   const messageData = await createMessageService(
     data,
     other_parent_id,
