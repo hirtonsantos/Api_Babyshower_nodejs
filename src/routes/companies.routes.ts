@@ -35,9 +35,10 @@ export const companiesRoutes = () => {
     "/:id",
     validateSchema(registerCompanySchema),
     verifyUniqueValuesMW,
+    verifyToken,
     companyUpdateController
   );
-  routes.delete("/:id", companyDeleteController);
+  routes.delete("/:id", verifyToken, companyDeleteController);
 
   return routes;
 };

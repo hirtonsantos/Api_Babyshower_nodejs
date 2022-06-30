@@ -5,7 +5,7 @@ import { AppError } from "../../errors/appError";
 
 const chatReadService = async (
   chat_id: string,
-  user_id: number,
+  user_id: any,
   page: number,
   perPage: number
 ) => {
@@ -18,8 +18,8 @@ const chatReadService = async (
     },
   });
 
-  if (!chat) {
-    throw new AppError(404, { message: "Chat not found" });
+  if (!chat.length) {
+    throw new AppError(404, { Message: "Chat not found" });
   }
 
   const chatCurrent = chat[0];

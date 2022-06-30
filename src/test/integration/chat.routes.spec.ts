@@ -92,7 +92,9 @@ describe("Create message for another parent | Integration Test", () => {
       .send({ ...msg });
 
     expect(response.status).toBe(401);
-    expect(response.body.error.message).toStrictEqual("Invalid Token");
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
   });
 });
 
@@ -209,7 +211,9 @@ describe("Get messages by chatId | Integration Test", () => {
       .set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(401);
-    expect(response.body.error.message).toStrictEqual("Invalid Token");
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
   });
 
   it("Return: Body error, no permision | Status code: 403", async () => {
@@ -223,16 +227,16 @@ describe("Get messages by chatId | Integration Test", () => {
     });
   });
 
-  // it("Return: Body error, chat not found | Status code: 404", async () => {
-  //   const response = await supertest(app)
-  //     .get(`/chat/${uuid()}`)
-  //     .set("Authorization", "Bearer " + token);
+  it("Return: Body error, chat not found | Status code: 404", async () => {
+    const response = await supertest(app)
+      .get(`/chat/idNotExist`)
+      .set("Authorization", "Bearer " + token);
 
-  //   expect(response.status).toBe(404);
-  // //   // expect(response.body).toStrictEqual({
-  // //   //   Message: "Chat not found",
-  // //   // });
-  // });
+    expect(response.status).toBe(404);
+    expect(response.body).toStrictEqual({
+      Message: "Chat not found",
+    });
+  });
 });
 
 describe("Get chats that parent is included | Integration Test", () => {
@@ -293,12 +297,6 @@ describe("Get chats that parent is included | Integration Test", () => {
     expect(response.status).toBe(200);
     expect(response.body.chats).toBeInstanceOf(Array);
     expect(response.body.chats).toHaveLength(8);
-    // expect(response.body[0]).toEqual(
-    //   expect.objectContaining({
-    //     ...chatsWithParent[0],
-    //     messages: `/chat/${chatsWithParent[0].id}`,
-    //   })
-    // );
   });
 
   it("Return: Chats as JSON response page 2 | Status code 200", async () => {
@@ -347,7 +345,9 @@ describe("Get chats that parent is included | Integration Test", () => {
       .set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(401);
-    expect(response.body.error.message).toStrictEqual("Invalid Token");
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
   });
 });
 
@@ -443,7 +443,9 @@ describe("Update chat to archieved", () => {
       .send();
 
     expect(response.status).toBe(401);
-    expect(response.body.error.message).toStrictEqual("Invalid Token");
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
   });
 
   it("Return: Body error, no permision | Status code: 403", async () => {
