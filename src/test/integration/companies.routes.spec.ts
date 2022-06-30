@@ -15,7 +15,7 @@ import { hashSync } from "bcrypt";
 import { verify } from "jsonwebtoken";
 import { Administrator } from "../../entities/administrators.entity";
 
-  describe("Create company route | Integration Test", () => {
+describe("Create company route | Integration Test", () => {
   let connection: DataSource;
 
   beforeAll(async () => {
@@ -272,7 +272,7 @@ describe("Get companies route | Integration Test", () => {
   });
 });
 
- describe("Get company route | Integration Test", () => {
+describe("Get company route | Integration Test", () => {
   let connection: DataSource;
 
   let tokenCompany: string;
@@ -395,7 +395,7 @@ describe("Get companies route | Integration Test", () => {
       Message: "Company not found",
     });
   });
-}); 
+});
 
 describe("Update company route | Integration Test", () => {
   let connection: DataSource;
@@ -510,7 +510,9 @@ describe("Update company route | Integration Test", () => {
       .send({ ...generateCompany() });
 
     expect(response.status).toBe(401);
-    expect(response.body.error.message).toStrictEqual("Invalid Token");
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
   });
 
   it("Return: Body error, no permision | Status code: 403", async () => {
@@ -538,8 +540,7 @@ describe("Update company route | Integration Test", () => {
   });
 
   it("Return: Body error, updating duplicate email | Status code: 409", async () => {
-
-    const newInformation = { ...generateCompany(), email: otherCompany.email};
+    const newInformation = { ...generateCompany(), email: otherCompany.email };
 
     const response = await supertest(app)
       .patch(`/companies/${company.id}`)
@@ -584,7 +585,6 @@ describe("Update company route | Integration Test", () => {
   });
 });
 
-
 describe("Delete company route | Integration Test", () => {
   let connection: DataSource;
 
@@ -617,7 +617,6 @@ describe("Delete company route | Integration Test", () => {
     );
     adm = await admRepo.save(adm);
     tokenAdm = generateToken(adm.id as string);
-    
 
     //add company
     const companyRepo = connection.getRepository(Company);
@@ -635,7 +634,6 @@ describe("Delete company route | Integration Test", () => {
   });
 
   it("Return: no body response | Status code: 204", async () => {
-
     const response = await supertest(app)
       .delete(`/companies/${company.id}`)
       .set("Authorization", "Bearer " + tokenCompany);
@@ -676,7 +674,9 @@ describe("Delete company route | Integration Test", () => {
       .set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(401);
-    expect(response.body.error.message).toStrictEqual("Invalid Token");
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
   });
 
   it("Return: Body error, no permision | Status code: 403", async () => {
