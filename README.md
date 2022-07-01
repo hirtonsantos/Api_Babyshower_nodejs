@@ -5,7 +5,7 @@
 
 \*Esta api foi desenvolvida em Node e funciona em conjunto com uma api principal desenvolvida em Python.
 
-\*\*A implementação do socket.io nas rotas do chat ainda estão em desenvolvimento.
+\*\*A implementação do socket.io nas rotas do chat ainda está em desenvolvimento.
 
 Url base da API-python no heroku: [baseUrl](https://share-babyshower.herokuapp.com/api)
 
@@ -33,8 +33,6 @@ Repositório da api complementar em Node.js:[Api_Babyshower_nodejs](https://gith
 - Heroku;
 - socket.io (feature ainda em desenvolvimento).
 
-<h2 align="center">Documentação***</h2>
+<h2 align="center">Documentação</h2>
 
 Link da documentação desta api: [Swagger](https://babyshower-api-node.herokuapp.com/api-documentation)
-
-\*\*\*Documentação das rotas de chat em desenvolvimento.
