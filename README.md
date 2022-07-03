@@ -9,9 +9,9 @@
 
 Url base da API-python no heroku: [baseUrl](https://share-babyshower.herokuapp.com/api)
 
-Url base da API-node no heroku: [baseUrlNode](https://babyshower-api-node.herokuapp.com/)
+Url base da API-node no heroku: [baseUrlNode](https://share-babyshower-node.herokuapp.com)
 
-Repositório da api complementar em Node.js:[Api_Babyshower_nodejs](https://github.com/danielmsatiro/Api_Babyshower_nodejs)
+Repositório da api principal em Python:[Api_Babyshower_nodejs](https://github.com/danielmsatiro/babyshower)
 
 ## Devs participantes:
 
@@ -35,4 +35,4 @@ Repositório da api complementar em Node.js:[Api_Babyshower_nodejs](https://gith
 
 <h2 align="center">Documentação</h2>
 
-Link da documentação desta api: [Swagger](https://babyshower-api-node.herokuapp.com/api-documentation)
+Link da documentação desta api: [Swagger](https://share-babyshower-node.herokuapp.com/api-documentation)
