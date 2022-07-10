@@ -1,27 +1,21 @@
 import { Response, Request } from "express";
-import { AppError, handleError } from "../../errors/appError";
+import { IArchived } from "../../interfaces/chat.interface";
 import chatArchiveService from "../../services/chat/chatArchive.service";
-import { getUserId } from "../../test/utils/getUserId";
-
 
 const chatArchiveController = async (req: Request, res: Response) => {
-  try {
-    const chat_id = req.params.id;
+  const chat_id = req.params.id;
 
-    const dataArchive = req.body
+  const dataArchive = req.body;
 
-    let token = req.headers.authorization?.replace('Bearer', '').trim()!;
+  const userId = req.decoded.id;
 
-    const userId = getUserId(token, res)
+  const data = await chatArchiveService(
+    dataArchive as IArchived,
+    chat_id,
+    userId
+  );
 
-    const data = await chatArchiveService(dataArchive, chat_id, userId)
-
-    return res.status(204).json(data)
-  } catch (error) {
-    if (error instanceof AppError) {
-      handleError(error, res);
-    }
-  }
+  return res.status(204).json();
 };
 
 export default chatArchiveController;

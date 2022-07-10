@@ -487,6 +487,17 @@
         "description": "Essa rota permite que a empresa cadastre uma anúncio para utilizar na plataforma baby shower. Este cadastro pode ser realizado por um administrador do sistema da babyshower.",
         "tags": ["Adverts"],
         "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "id da empresa no formato uuid",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -906,6 +917,387 @@
           }
         }
       }
+    },
+    "/upload": {
+      "post": {
+        "summary": "Faz o upload de uma imagem na AWS",
+        "description": "Essa rota permite o upload da imagem (formatos image/jpeg, image/jpg, image/png, image/gif com até 2MB) para o bucket da AWS retornando o link de acesso. Apenas uma imagem deve ser enviada por vez para somente um dos filenames a seguir.",
+        "tags": ["Upload"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image-profile": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "image-product-1": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "image-product-2": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "image-product-3": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "image-product-4": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "image-advert": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "image-company": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "properties": {
+                    "msgSuccess": {
+                      "type": "string",
+                      "example": "File sent successfully!"
+                    },
+                    "url": {
+                      "type": "string",
+                      "example": "https://<enderecoBucketAmazon><idDoUsuárioOuCompany>-flagName/"
+                    },
+                    "key": {
+                      "type": "string",
+                      "example": "image-company@$2b$10$7Nr5OSrrmhdahMRq9L4J6.WgiB1g212KgrOJEsFP.qnehVGhC2nPW.png"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Tentativa de acesso sem token ou envio de mais de duas imagens ou tipo de arquivo não é imagem",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InvalidFileError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/MissingTokenError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/OneFileError"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token informado é inválido ou usuário não é administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTokenError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Filename não segue um dos names padronizados ou o tamanho do arquivo é superior a 2mb",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Faz a deleção de uma imagem na AWS",
+        "description": "Essa rota permite a deleção da imagem arquivada no bucket da AWS. Somente administradores do sistema da babyshower ou o dono do cadastro podem fazer esta operação.",
+        "tags": ["Upload"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "aplication/json": {
+              "schema": {
+                "required": ["key"],
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "example": "image-profile@$2b$10$D.4cOntB6NpxZyEiBHksh.Xa9BPFiPcs6gP7duyggW1r4SNa2amoq"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Tentativa de acesso sem token",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingTokenError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token informado é inválido ou usuário não é administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTokenError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Usuário tentando acessar informações de outro usuário sem ter poderes de administrador",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoPermissionError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyNotFoundError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat": {
+      "get": {
+        "summary": "Retorna uma lista de chats abertos",
+        "description": "Retorna a lista dos chats abertos em que o usuário logado faz parte.",
+        "tags": ["Chat"],
+        "responses": {
+          "200": {
+            "description": "Lista de chats",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "properties": {
+                    "chats": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Chat"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Tentativa de acesso sem token",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingTokenError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token informado é inválido",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTokenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatNotFoundError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/{id}": {
+      "post": {
+        "summary": "Envia um mensagem para outro usuário",
+        "description": "Essa rota identifica o usuário da api principal (em python) pelo token e permite enviar uma mensagem para outro usuário desta mesma api externa.",
+        "tags": ["Chat"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "id do usuário para quem se pretende enviar a mensagem",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "aplication/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/NewMessage"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Message"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Tentativa de acesso sem token ou tipos de dados incorretos",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingTokenError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token informado é inválido",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTokenError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Retorna as mensagens de um chat específico",
+        "description": "Busca as mensagens através do id do chat, mas para isso o usuário logado precisa fazer parte da conversa.",
+        "tags": ["Chat"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "id do chat no formato uuid",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "properties": {
+                    "messages": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Message"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Tentativa de acesso sem token",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingTokenError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token informado é inválido",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTokenError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Usuário tentando acessar sem ser participante",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoPermissionError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatNotFoundError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1030,6 +1422,16 @@
           }
         }
       },
+      "NewMessage": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Olá tudo bem? Eu vi seu anúncio no site."
+          }
+        }
+      },
       "Token": {
         "type": "object",
         "properties": {
@@ -1084,7 +1486,76 @@
           }
         ]
       },
-
+      "Message": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NewMessage"
+          },
+          {
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "8556983d-938a-4354-b446-7ffe60f5e9af"
+              },
+              "msgSuccess": {
+                "type": "string",
+                "example": "Message sent successfully!"
+              },
+              "message": {
+                "type": "string",
+                "example": "Olá tudo bem? Eu vi seu anúncio no site."
+              },
+              "createdAt": {
+                "type": "string",
+                "example": "Fri, 06 May 2022 12:49:26 GMT"
+              },
+              "readMessage": {
+                "type": "boolean",
+                "example": false
+              },
+              "parentId": {
+                "type": "integer",
+                "example": 5
+              },
+              "chat": {
+                "type": "string",
+                "example": "/chat/8556983d-938a-4354-b446-7ffe60f5e9af"
+              }
+            }
+          }
+        ]
+      },
+      "Chat": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "8556983d-938a-4354-b446-7ffe60f5e9af"
+          },
+          "archived": {
+            "type": "boolean",
+            "default": false,
+            "example": false,
+            "deprecated": true
+          },
+          "parent_user": {
+            "type": "integer",
+            "example": 3465
+          },
+          "other_parent_user": {
+            "type": "integer",
+            "example": 3466
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            }
+          }
+        }
+      },
       "InvalidCredentialsError": {
         "type": "object",
         "properties": {
@@ -1100,6 +1571,41 @@
           "Error": {
             "type": "string",
             "example": "Missing authorization token"
+          }
+        }
+      },
+      "InvalidFileError": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "example": "Invalid file type"
+          }
+        }
+      },
+      "OneFileError": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "example": "This route works for one file per each request"
+          }
+        }
+      },
+      "InternalError": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "error"
+          },
+          "code": {
+            "type": "number",
+            "example": 500
+          },
+          "message": {
+            "type": "string",
+            "example": "Internal server error"
           }
         }
       },
@@ -1136,6 +1642,15 @@
           "Message": {
             "type": "string",
             "example": "Advert not found"
+          }
+        }
+      },
+      "ChatNotFoundError": {
+        "type": "object",
+        "properties": {
+          "Message": {
+            "type": "string",
+            "example": "Chat not found"
           }
         }
       }

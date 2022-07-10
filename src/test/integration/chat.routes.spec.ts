@@ -21,16 +21,15 @@ describe("Create message for another parent | Integration Test", () => {
   afterAll(async () => {
     await connection.destroy();
   });
-  
 
   it("Return: Message as JSON response | Status code 201", async () => {
     const token = generateToken(1);
-    const msg = generateMessage()
+    const msg = generateMessage();
 
     const response = await supertest(app)
       .post(`/chat/2`)
       .set("Authorization", "Bearer " + token)
-      .send({...msg})
+      .send({ ...msg });
 
     const chatRepo = connection.getRepository(Chat);
     const chat = await chatRepo.findOne({
@@ -42,9 +41,9 @@ describe("Create message for another parent | Integration Test", () => {
 
     const messageData = {
       msgSucess: "Message sent successfully!",
-      message: msg,
-      readMessage: false,
-      parentId: 1,
+      message: msg.message,
+      read_message: false,
+      parent_id: 1,
       chat: `/chat/${chat?.id}`,
     };
 
@@ -52,10 +51,7 @@ describe("Create message for another parent | Integration Test", () => {
     expect(response.body).toHaveProperty(["id"]);
     expect(validate(response.body.id)).toBeTruthy();
     expect(response.body).toHaveProperty(["createdAt"]);
-    expect(response.body.msgSucess).toBe(messageData.msgSucess);
-    expect(response.body.message).toBe(messageData.message.message);
-    expect(messageData.readMessage).toBe(false)
-    expect(chat).toBeTruthy();
+    expect(response.body).toEqual(expect.objectContaining({ ...messageData }));
   });
 
   it("Return: Body error, missing token | Status code: 400", async () => {
@@ -84,17 +80,19 @@ describe("Create message for another parent | Integration Test", () => {
 
   it("Return: Body error, invalid token | Status code: 401", async () => {
     const token = "invalidToken";
-    const msg = generateMessage()
+    const msg = generateMessage();
 
     const response = await supertest(app)
       .post(`/chat/2`)
       .set("Authorization", "Bearer " + token)
-      .send({...msg});
+      .send({ ...msg });
 
     expect(response.status).toBe(401);
-    expect(response.body.error.message).toStrictEqual("Invalid Token");
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
+  });
 });
-})
 
 describe("Get messages by chatId | Integration Test", () => {
   let connection: DataSource;
@@ -157,41 +155,12 @@ describe("Get messages by chatId | Integration Test", () => {
       .get(`/chat/${chatWithParent.id}`)
       .set("Authorization", "Bearer " + token);
 
-    const { chat, ...message } = chatWithParent.messages[0];
+    const { chat, createdAt, ...message } = chatWithParent.messages[0];
 
     expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty(["messages"]);
     expect(response.body.messages).toBeInstanceOf(Array);
-    expect(response.body.messages).toHaveLength(8);
-    expect(response.body.messages[0].message).toBe(message.message);
-  });
-
-  it("Return: Messages as JSON response page 2 | Status code 200", async () => {
-    const response = await supertest(app)
-      .get(`/chat/${chatWithParent.id}?page=2`)
-      .set("Authorization", "Bearer " + token);
-
-    expect(response.status).toBe(200);
-    expect(response.body.messages).toBeInstanceOf(Array);
-  });
-
-  it("Return: Messages as JSON response perPage 4 | Status code 200", async () => {
-    const response = await supertest(app)
-      .get(`/chat/${chatWithParent.id}?per_page=4`)
-      .set("Authorization", "Bearer " + token);
-
-    expect(response.status).toBe(200);
-    expect(response.body.messages).toBeInstanceOf(Array);
-    expect(response.body.messages).toHaveLength(4);
-  });
-
-  it("Return: Messages as JSON response page 2 perPage 3 | Status code 200", async () => {
-    const response = await supertest(app)
-      .get(`/chat/${chatWithParent.id}?page=2&per_page=3`)
-      .set("Authorization", "Bearer " + token);
-
-    expect(response.status).toBe(200);
-    expect(response.body.messages).toBeInstanceOf(Array);
-    expect(response.body.messages).toHaveLength(3);
+    expect(response.body.messages[0]).toEqual(expect.objectContaining(message));
   });
 
   it("Return: Body error, missing token | Status code: 400", async () => {
@@ -209,7 +178,9 @@ describe("Get messages by chatId | Integration Test", () => {
       .set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(401);
-    expect(response.body.error.message).toStrictEqual("Invalid Token");
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
   });
 
   it("Return: Body error, no permision | Status code: 403", async () => {
@@ -223,16 +194,16 @@ describe("Get messages by chatId | Integration Test", () => {
     });
   });
 
-  // it("Return: Body error, chat not found | Status code: 404", async () => {
-  //   const response = await supertest(app)
-  //     .get(`/chat/${uuid()}`)
-  //     .set("Authorization", "Bearer " + token);
+  it("Return: Body error, chat not found | Status code: 404", async () => {
+    const response = await supertest(app)
+      .get(`/chat/idNotExist`)
+      .set("Authorization", "Bearer " + token);
 
-  //   expect(response.status).toBe(404);
-  // //   // expect(response.body).toStrictEqual({
-  // //   //   Message: "Chat not found",
-  // //   // });
-  // });
+    expect(response.status).toBe(404);
+    expect(response.body).toStrictEqual({
+      Message: "Chat not found",
+    });
+  });
 });
 
 describe("Get chats that parent is included | Integration Test", () => {
@@ -249,10 +220,10 @@ describe("Get chats that parent is included | Integration Test", () => {
         console.error("Error during Data Source initialization", err);
       });
 
-    //cria 10 chats que o usuário participa e popula com 1 mensagem cada
+    //cria 6 chats que o usuário participa e não estão arquivados e popula com 1 mensagem cada
     const chatRepo = connection.getRepository(Chat);
     const messageRepo = connection.getRepository(Message);
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 6; i++) {
       let message = Object.assign(new Message(), {
         ...createMessageForData(1),
       });
@@ -260,6 +231,23 @@ describe("Get chats that parent is included | Integration Test", () => {
       let chatWithParent = Object.assign(new Chat(), {
         parent_user: 1,
         other_parent_user: i + 1,
+        messages: [],
+      });
+      chatWithParent.messages.push(message);
+      chatWithParent = await chatRepo.save(chatWithParent);
+      chatsWithParent.push(chatWithParent);
+    }
+
+    //cria 4 chats que o usuário participa que estejam arquivados e popula com 1 mensagem
+    for (let i = 1; i <= 4; i++) {
+      let message = Object.assign(new Message(), {
+        ...createMessageForData(1),
+      });
+      await messageRepo.save(message);
+      let chatWithParent = Object.assign(new Chat(), {
+        parent_user: 1,
+        other_parent_user: i + 1,
+        archived: true,
         messages: [],
       });
       chatWithParent.messages.push(message);
@@ -285,50 +273,14 @@ describe("Get chats that parent is included | Integration Test", () => {
     await connection.destroy();
   });
 
-  it("Return: Chats as JSON response | Status code 200", async () => {
+  it("Return: Not archived Chats as JSON response | Status code 200", async () => {
     const response = await supertest(app)
       .get(`/chat`)
       .set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(200);
     expect(response.body.chats).toBeInstanceOf(Array);
-    expect(response.body.chats).toHaveLength(8);
-    // expect(response.body[0]).toEqual(
-    //   expect.objectContaining({
-    //     ...chatsWithParent[0],
-    //     messages: `/chat/${chatsWithParent[0].id}`,
-    //   })
-    // );
-  });
-
-  it("Return: Chats as JSON response page 2 | Status code 200", async () => {
-    const response = await supertest(app)
-      .get(`/chat?page=2`)
-      .set("Authorization", "Bearer " + token);
-
-    expect(response.status).toBe(200);
-    expect(response.body.chats).toBeInstanceOf(Array);
-    expect(response.body.chats).toHaveLength(8);
-  });
-
-  it("Return: Chats as JSON response perPage 4 | Status code 200", async () => {
-    const response = await supertest(app)
-      .get(`/chat?per_page=4`)
-      .set("Authorization", "Bearer " + token);
-
-    expect(response.status).toBe(200);
-    expect(response.body.chats).toBeInstanceOf(Array);
-    expect(response.body.chats).toHaveLength(4);
-  });
-
-  it("Return: Chats as JSON response page 3 perPage 4 | Status code 200", async () => {
-    const response = await supertest(app)
-      .get(`/chat?page=3&per_page=4`)
-      .set("Authorization", "Bearer " + token);
-
-    expect(response.status).toBe(200);
-    expect(response.body.messages).toBeInstanceOf(Array);
-    expect(response.body.messages).toHaveLength(10);
+    expect(response.body.chats).toHaveLength(6);
   });
 
   it("Return: Body error, missing token | Status code: 400", async () => {
@@ -347,11 +299,13 @@ describe("Get chats that parent is included | Integration Test", () => {
       .set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(401);
-    expect(response.body.error.message).toStrictEqual("Invalid Token");
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
   });
 });
 
-describe("Update chat to archieved", () => {
+/* describe("Update chat to archieved", () => {
   let connection: DataSource;
 
   let chatWithParent: any;
@@ -364,7 +318,7 @@ describe("Update chat to archieved", () => {
       .catch((err) => {
         console.error("Error during Data Source initialization", err);
       });
-      
+
     //cria um chat que o usuário participa com uma mensagem
     const chatRepo = connection.getRepository(Chat);
     const messageRepo = connection.getRepository(Message);
@@ -443,7 +397,9 @@ describe("Update chat to archieved", () => {
       .send();
 
     expect(response.status).toBe(401);
-    expect(response.body.error.message).toStrictEqual("Invalid Token");
+    expect(response.body).toStrictEqual({
+      Error: "Invalid Token",
+    });
   });
 
   it("Return: Body error, no permision | Status code: 403", async () => {
@@ -457,7 +413,6 @@ describe("Update chat to archieved", () => {
       Error: "You can't access information of another user",
     });
   });
-  
 
   it("Return: Body error, chat not Found | Status code: 404", async () => {
     const response = await supertest(app)
@@ -470,4 +425,4 @@ describe("Update chat to archieved", () => {
       Message: "Chat not found",
     });
   });
-});
+}); */
